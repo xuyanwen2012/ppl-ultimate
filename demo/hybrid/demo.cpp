@@ -32,17 +32,49 @@ int demo(const int n_threads) {
 
   gpu::initialize_dispatcher(1);
 
-  gpu::dispatch_ComputeMorton(1, 0, *pipe_ptr);
+  BS::timer timer;
 
-  gpu::dispatch_RadixSort(1, 0, *pipe_ptr);
+  timer.start();
 
-  gpu::sync_device();
+  const auto grid_size = 16;
+
+  gpu::dispatch_ComputeMorton(grid_size, 0, *pipe_ptr);
+
+  gpu::dispatch_RadixSort(grid_size, 0, *pipe_ptr);
+
+  gpu::dispatch_RemoveDuplicates_sync(grid_size, 0, *pipe_ptr);
+
+  gpu::dispatch_BuildRadixTree(grid_size, 0, *pipe_ptr);
+
+  gpu::dispatch_EdgeCount(grid_size, 0, *pipe_ptr);
+  gpu::dispatch_EdgeOffset_async(grid_size, 0, *pipe_ptr);
+  gpu::sync_stream(0);
+
+  // todo: hide this
+  pipe_ptr->oct.set_n_nodes(
+      pipe_ptr->u_edge_offset[pipe_ptr->n_brt_nodes() - 1]);
+
+  gpu::dispatch_BuildOctree(grid_size, 0, *pipe_ptr);
 
   // gpu::sync_stream(0);
+  gpu::sync_device();
+
+  timer.stop();
 
   const auto is_sorted =
       std::is_sorted(pipe_ptr->u_morton, pipe_ptr->u_morton + n);
   std::cout << "Is sorted: " << std::boolalpha << is_sorted << '\n';
+
+  std::cout << "==========================\n";
+  std::cout << " Total Time spent: " << timer.ms() << " ms\n";
+  std::cout << " n_unique = " << pipe_ptr->n_unique_mortons() << " ("
+            << static_cast<double>(pipe_ptr->n_unique_mortons()) / n * 100.0
+            << "%)\n";
+  std::cout << " n_brt_nodes = " << pipe_ptr->n_brt_nodes() << '\n';
+  std::cout << " n_octree_nodes = " << pipe_ptr->n_oct_nodes() << " ("
+            << static_cast<double>(pipe_ptr->n_oct_nodes()) / n * 100.0
+            << "%)\n";
+  std::cout << "--------------------------\n";
 
   gpu::release_dispatcher();
 

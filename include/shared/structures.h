@@ -96,7 +96,7 @@ struct octree {
 
   [[nodiscard]] int n_nodes() const {
     if (n_oct_nodes == UNINITIALIZED)
-      throw std::runtime_error("BRT nodes unset!!!");
+      throw std::runtime_error("OCT nodes unset!!!");
     return n_oct_nodes;
   }
 };
@@ -107,7 +107,7 @@ struct pipe {
   // ------------------------
 
   // mutable
-  int n_unique;
+  int n_unique = UNINITIALIZED;
 
   glm::vec4 *u_points;
   morton_t *u_morton;
@@ -170,10 +170,22 @@ struct pipe {
   // ------------------------
   [[nodiscard]] int n_input() const { return n_points; }
   [[nodiscard]] int n_brt_nodes() const { return brt.n_nodes(); }
-  [[nodiscard]] int n_unique_mortons() const { return n_unique; }
+  [[nodiscard]] int n_unique_mortons() const {
+    if (n_unique == UNINITIALIZED)
+      throw std::runtime_error("Unique mortons unset!!!");
+    return n_unique;
+  }
   [[nodiscard]] int n_oct_nodes() const { return oct.n_nodes(); }
 
+  void set_n_unique(const size_t n_unique) {
+    assert(n_unique <= n_points);
+    this->n_unique = static_cast<int>(n_unique);
+  }
+
+  // alias to make the code more understand able
+  [[nodiscard]] const morton_t *getSortedKeys() const { return u_morton; }
+  [[nodiscard]] morton_t *getUniqueKeys() { return u_morton_alt; }
+  [[nodiscard]] const morton_t *getUniqueKeys() const { return u_morton_alt; }
 
   void clearSmem();
-
 };
