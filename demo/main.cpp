@@ -2,7 +2,9 @@
 #include <random>
 #include <vector>
 
-#include "kernels/host/all.hpp"
+#include "host/all.hpp"
+#include "host/barrier.hpp"
+#include "host/sort.hpp"
 #include "shared/morton_func.h"
 #include "shared/structures.h"
 
@@ -10,10 +12,6 @@
 #include "third-party/BS_thread_pool.hpp"
 #include "third-party/BS_thread_pool_utils.hpp"
 #include "third-party/CLI11.hpp"
-
-// ---------------------------------------------------------------------
-// Morton encoding (1->1 relation)
-// ---------------------------------------------------------------------
 
 int main(const int argc, const char *argv[]) {
   const auto max_cpu_cores = std::thread::hardware_concurrency();
@@ -49,6 +47,7 @@ int main(const int argc, const char *argv[]) {
   });
 
   BS::thread_pool pool;
+  barrier sort_barrier(n_threads);
 
   BS::timer timer;
 
@@ -57,15 +56,43 @@ int main(const int argc, const char *argv[]) {
   cpu::dispatch_morton_code(
       pool, n_threads, u_points, u_morton, min_coord, range)
       .wait();
+  cpu::dispatch_binning_pass(
+      pool, n_threads, sort_barrier, u_morton, u_morton_alt, 0)
+      .wait();
+  cpu::dispatch_binning_pass(
+      pool, n_threads, sort_barrier, u_morton_alt, u_morton, 8)
+      .wait();
+  cpu::dispatch_binning_pass(
+      pool, n_threads, sort_barrier, u_morton, u_morton_alt, 16)
+      .wait();
+  cpu::dispatch_binning_pass(
+      pool, n_threads, sort_barrier, u_morton_alt, u_morton, 24)
+      .wait();
 
   timer.stop();
 
-  // peek 32 morton codes
-  for (auto i = 0; i < 32; ++i) {
-    std::cout << u_morton[i] << std::endl;
-  }
+	// ---------------------------------------------------------------------
+	// Validation
+	// ---------------------------------------------------------------------
 
-  std::cout << "Elapsed time: " << timer.ms() << " ms" << std::endl;
+	std::cout << "==========================\n";
+	std::cout << " Total Time spent: " << timer.ms() << " ms\n";
+	// std::cout << " n_unique = " << n_unique << '\n';
+	// std::cout << " n_brt_nodes = " << brt->n_nodes() << '\n';
+	// std::cout << " n_octree_nodes = " << n_octree_nodes << " (" << static_cast<double>(n_octree_nodes) / n * 100.0 <<
+	// 	"%)\n";
+	std::cout << "--------------------------\n";
+	// std::cout << " Morton: " << morton_timestamp << " ms\n";
+	// std::cout << " Sort: " << sort_timestamp - morton_timestamp << " ms\n";
+	// std::cout << " Unique: " << unique_timestamp - sort_timestamp << " ms\n";
+	// std::cout << " BRT: " << brt_timestamp - unique_timestamp << " ms\n";
+	// std::cout << " Edge Count && Offset: " << edge_offset_timestamp - brt_timestamp << " ms\n";
+	// std::cout << " Octree: " << timer.current_ms() - edge_offset_timestamp << " ms\n";
+	std::cout << "==========================\n";
+
+	const auto is_sorted = std::is_sorted(u_morton.begin(), u_morton.end());
+	std::cout << "Is sorted: " << std::boolalpha
+		<< is_sorted << '\n';
 
   return 0;
 }

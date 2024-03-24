@@ -5,6 +5,10 @@
 
 namespace cpu {
 
+// ---------------------------------------------------------------------
+// Morton encoding (1->1 relation)
+// ---------------------------------------------------------------------
+
 [[nodiscard]]
 BS::multi_future<void> dispatch_morton_code(
     BS::thread_pool &pool,

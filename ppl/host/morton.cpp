@@ -1,4 +1,4 @@
-#include "kernels/host/morton.hpp"
+#include "host/morton.hpp"
 
 BS::multi_future<void> cpu::dispatch_morton_code(
     BS::thread_pool &pool,
