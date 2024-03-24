@@ -57,6 +57,7 @@ pipe::pipe(const int n,
   MALLOC_MANAGED(&u_edge_count, n);
   MALLOC_MANAGED(&u_edge_offset, n);
 
+  // binning_blocks = 270 usually (w/ ~2M points)
   MALLOC_DEVICE(&im_storage.d_global_histogram, RADIX * RADIX_PASSES);
   MALLOC_DEVICE(&im_storage.d_index, RADIX_PASSES);
   MALLOC_DEVICE(&im_storage.d_first_pass_histogram, RADIX * binning_blocks);
@@ -84,4 +85,13 @@ pipe::~pipe() {
   CUDA_FREE(im_storage.d_fourth_pass_histogram);
 
   CUDA_FREE(im_storage.u_flag_heads);
+}
+
+void pipe::clearSmem() {
+  SET_MEM_2_ZERO(im_storage.d_global_histogram, RADIX * RADIX_PASSES);
+  SET_MEM_2_ZERO(im_storage.d_index, RADIX_PASSES);
+  SET_MEM_2_ZERO(im_storage.d_first_pass_histogram, RADIX * binning_blocks);
+  SET_MEM_2_ZERO(im_storage.d_second_pass_histogram, RADIX * binning_blocks);
+  SET_MEM_2_ZERO(im_storage.d_third_pass_histogram, RADIX * binning_blocks);
+  SET_MEM_2_ZERO(im_storage.d_fourth_pass_histogram, RADIX * binning_blocks);
 }

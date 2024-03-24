@@ -35,6 +35,7 @@
  *
  ******************************************************************************/
 
+#include <cstdio>
 #include <cub/util_math.cuh>
 
 #include "cuda/common.cuh"

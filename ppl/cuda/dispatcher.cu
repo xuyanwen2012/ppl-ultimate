@@ -7,7 +7,10 @@
 #include "cuda/05_edge_count.cuh"
 #include "cuda/06_prefix_sum.cuh"
 #include "cuda/07_octree.cuh"
+#include "cuda/agents/prefix_sum_agent.cuh"
+#include "cuda/agents/unique_agent.cuh"
 #include "cuda/helper.cuh"
+#include "shared/morton_func.h"
 #include "shared/structures.h"
 
 namespace gpu {
@@ -42,7 +45,124 @@ void dispatch_ComputeMorton(const int grid_size,
       pipe.u_points, pipe.u_morton, pipe.n_input(), pipe.min_coord, pipe.range);
 }
 
-void dispatch_RadixSort(const int grid_size, const int stream_id, pipe& pipe);
+void dispatch_RadixSort(const int grid_size, const int stream_id, pipe& pipe) {
+  const auto n = pipe.n_input();
+
+  static_assert(sizeof(morton_t) == sizeof(unsigned int));
+
+  pipe.clearSmem();
+
+  const auto& stream = streams[stream_id];
+
+  k_GlobalHistogram<<<grid_size, pipe::GLOBAL_HIST_THREADS, 0, stream>>>(
+      pipe.u_morton, pipe.im_storage.d_global_histogram, n);
+
+  k_Scan<<<pipe::RADIX_PASSES, pipe::RADIX, 0, stream>>>(
+      pipe.im_storage.d_global_histogram,
+      pipe.im_storage.d_first_pass_histogram,
+      pipe.im_storage.d_second_pass_histogram,
+      pipe.im_storage.d_third_pass_histogram,
+      pipe.im_storage.d_fourth_pass_histogram);
+
+  k_DigitBinningPass<<<grid_size,
+                       pipe::BINNING_THREADS,
+                       0,
+                       stream>>>(pipe.u_morton,  // <---
+                                 pipe.u_morton_alt,
+                                 pipe.im_storage.d_first_pass_histogram,
+                                 pipe.im_storage.d_index,
+                                 n,
+                                 0);
+
+  k_DigitBinningPass<<<grid_size, pipe::BINNING_THREADS, 0, stream>>>(
+      pipe.u_morton_alt,
+      pipe.u_morton,  // <---
+      pipe.im_storage.d_second_pass_histogram,
+      pipe.im_storage.d_index,
+      n,
+      8);
+
+  k_DigitBinningPass<<<grid_size,
+                       pipe::BINNING_THREADS,
+                       0,
+                       stream>>>(pipe.u_morton,  // <---
+                                 pipe.u_morton_alt,
+                                 pipe.im_storage.d_third_pass_histogram,
+                                 pipe.im_storage.d_index,
+                                 n,
+                                 16);
+
+  k_DigitBinningPass<<<grid_size, pipe::BINNING_THREADS, 0, stream>>>(
+      pipe.u_morton_alt,
+      pipe.u_morton,  // <---
+      pipe.im_storage.d_fourth_pass_histogram,
+      pipe.im_storage.d_index,
+      n,
+      24);
+
+  sync_device();
+}
+
+// const auto n = pipe.n_input();
+
+// pipe.clearSmem();
+
+// k_GlobalHistogram<<<grid_size,
+//                     pipe::GLOBAL_HIST_THREADS,
+//                     0,
+//                     streams[stream_id]>>>(
+//     pipe.u_morton, pipe.im_storage.d_global_histogram, n);
+
+// k_Scan<<<pipe::RADIX_PASSES, pipe::RADIX, 0, streams[stream_id]>>>(
+//     pipe.im_storage.d_global_histogram,
+//     pipe.im_storage.d_first_pass_histogram,
+//     pipe.im_storage.d_second_pass_histogram,
+//     pipe.im_storage.d_third_pass_histogram,
+//     pipe.im_storage.d_fourth_pass_histogram);
+
+// k_DigitBinningPass<<<grid_size,
+//                      pipe::BINNING_THREADS,
+//                      0,
+//                      streams[stream_id]>>>(
+//     pipe.u_morton,  // <---
+//     pipe.u_morton_alt,
+//     pipe.im_storage.d_first_pass_histogram,
+//     pipe.im_storage.d_index,
+//     n,
+//     0);
+
+// k_DigitBinningPass<<<grid_size,
+//                      pipe::BINNING_THREADS,
+//                      0,
+//                      streams[stream_id]>>>(
+//     pipe.u_morton_alt,
+//     pipe.u_morton,  // <---
+//     pipe.im_storage.d_second_pass_histogram,
+//     pipe.im_storage.d_index,
+//     n,
+//     8);
+
+// k_DigitBinningPass<<<grid_size,
+//                      pipe::BINNING_THREADS,
+//                      0,
+//                      streams[stream_id]>>>(
+//     pipe.u_morton,  // <---
+//     pipe.u_morton_alt,
+//     pipe.im_storage.d_third_pass_histogram,
+//     pipe.im_storage.d_index,
+//     n,
+//     16);
+
+// k_DigitBinningPass<<<grid_size,
+//                      pipe::BINNING_THREADS,
+//                      0,
+//                      streams[stream_id]>>>(
+//     pipe.u_morton_alt,
+//     pipe.u_morton,  // <---
+//     pipe.im_storage.d_fourth_pass_histogram,
+//     pipe.im_storage.d_index,
+//     n,
+//     24);
 
 void dispatch_RemoveDuplicates(const int grid_size,
                                const int stream_id,

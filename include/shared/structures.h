@@ -131,7 +131,7 @@ struct pipe {
   static constexpr auto RADIX = 256;
   static constexpr auto RADIX_PASSES = 4;
   static constexpr auto BIN_PART_SIZE = 7680;
-  static constexpr auto BIN_PARTS = 2;
+  // static constexpr auto BIN_PARTS = 2;
   static constexpr auto GLOBAL_HIST_THREADS = 128;
   static constexpr auto BINNING_THREADS = 512;
 
@@ -172,4 +172,8 @@ struct pipe {
   [[nodiscard]] int n_brt_nodes() const { return brt.n_nodes(); }
   [[nodiscard]] int n_unique_mortons() const { return n_unique; }
   [[nodiscard]] int n_oct_nodes() const { return oct.n_nodes(); }
+
+
+  void clearSmem();
+
 };

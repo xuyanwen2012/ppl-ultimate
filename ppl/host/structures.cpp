@@ -62,3 +62,7 @@ pipe::~pipe() {
   delete[] u_edge_count;
   delete[] u_edge_offset;
 }
+
+void pipe::clearSmem() {
+  // no effect on CPU
+}
