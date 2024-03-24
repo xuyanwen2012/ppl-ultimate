@@ -37,7 +37,16 @@ octree::~octree() {
 
 constexpr auto educated_guess = 0.55;
 
-pipe::pipe(const int n) : n_points(n), brt(n), oct(n * educated_guess) {
+pipe::pipe(const int n,
+           const float min_coord,
+           const float range,
+           const int seed)
+    : brt(n),
+      oct(n * educated_guess),
+      n_points(n),
+      min_coord(min_coord),
+      range(range),
+      seed(seed) {
   u_points = new glm::vec4[n];
   u_morton = new morton_t[n];
   u_morton_alt = new morton_t[n];

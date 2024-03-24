@@ -106,7 +106,7 @@ struct pipe {
   // Essential Data (CPU/GPU shared)
   // ------------------------
 
-  int n_points;
+  // mutable
   int n_unique;
 
   glm::vec4 *u_points;
@@ -116,6 +116,12 @@ struct pipe {
   int *u_edge_count;
   int *u_edge_offset;
   octree oct;
+
+  // read-only
+  int n_points;
+  float min_coord;
+  float range;
+  int seed;
 
   // ------------------------
   // Temporary Storage (for GPU only)
@@ -147,7 +153,10 @@ struct pipe {
 
   pipe() = delete;
 
-  explicit pipe(const int n_points);
+  explicit pipe(const int n_points,
+                float min_coord = 0.0f,
+                float range = 1024.0f,
+                int seed = 114514);
 
   pipe(const pipe &) = delete;
   pipe &operator=(const pipe &) = delete;

@@ -40,10 +40,16 @@ octree::~octree() {
 
 constexpr auto educated_guess = 0.55;
 
-pipe::pipe(const int n)
-    : n_points(n),
-      brt(n),
+pipe::pipe(const int n,
+           const float min_coord,
+           const float range,
+           const int seed)
+    : brt(n),
       oct(n * educated_guess),
+      n_points(n),
+      min_coord(min_coord),
+      range(range),
+      seed(seed),
       binning_blocks(cub::DivideAndRoundUp(n, BIN_PART_SIZE)) {
   MALLOC_MANAGED(&u_points, n);
   MALLOC_MANAGED(&u_morton, n);
