@@ -37,7 +37,7 @@ void dispatch_BuildRadixTree(const int grid_size,
 
 void dispatch_EdgeCount(const int grid_size, const int stream_id, pipe& pipe);
 
-void dispatch_EdgeOffset_async(const int grid_size,
+void dispatch_EdgeOffset(const int grid_size,
                                const int stream_id,
                                pipe& pipe);
 

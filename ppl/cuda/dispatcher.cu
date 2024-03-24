@@ -105,7 +105,19 @@ void dispatch_RadixSort(const int grid_size, const int stream_id, pipe& pipe) {
 
 void dispatch_RemoveDuplicates_async(const int grid_size,
                                      const int stream_id,
-                                     pipe& pipe) {
+                                     pipe& pipe) {}
+
+void RemoveDuplicates_on_complete(const int grid_size,
+                                  const int stream_id,
+                                  pipe& pipe) {
+  SYNC_STREAM(streams[stream_id]);
+  pipe.set_n_unique(pipe.im_storage.u_flag_heads[pipe.n_input() - 1]);
+  pipe.brt.set_n_nodes(pipe.n_unique_mortons() - 1);
+}
+
+void dispatch_RemoveDuplicates_sync(const int grid_size,
+                                    const int stream_id,
+                                    pipe& pipe) {
   constexpr auto unique_block_size = UniqueAgent::n_threads;  // 256
   constexpr auto prefix_block_size =
       PrefixSumAgent<unsigned int>::n_threads;  // 128
@@ -128,21 +140,12 @@ void dispatch_RemoveDuplicates_async(const int grid_size,
       pipe.n_input(),
       pipe.getUniqueKeys(),  // <-- output
       nullptr);
-}
+  SYNC_STREAM(stream);
 
-void RemoveDuplicates_on_complete(const int grid_size,
-                                  const int stream_id,
-                                  pipe& pipe) {
-  SYNC_STREAM(streams[stream_id]);
-  pipe.set_n_unique(pipe.im_storage.u_flag_heads[pipe.n_input() - 1]);
-  pipe.brt.set_n_nodes(pipe.n_unique_mortons() - 1);
-}
-
-void dispatch_RemoveDuplicates_sync(const int grid_size,
-                                    const int stream_id,
-                                    pipe& pipe) {
-  dispatch_RemoveDuplicates_async(grid_size, stream_id, pipe);
-  RemoveDuplicates_on_complete(grid_size, stream_id, pipe);
+  // last element of flag_heads(prefix summed) is the number of unique elements
+  const auto n_unique = pipe.im_storage.u_flag_heads[pipe.n_input() - 1];
+  pipe.set_n_unique(n_unique);
+  pipe.brt.set_n_nodes(n_unique - 1);
 }
 
 void dispatch_BuildRadixTree(const int grid_size,
@@ -171,9 +174,7 @@ void dispatch_EdgeCount(const int grid_size, const int stream_id, pipe& pipe) {
                                                     pipe.n_brt_nodes());
 }
 
-void dispatch_EdgeOffset_async(const int grid_size,
-                               const int stream_id,
-                               pipe& pipe) {
+void dispatch_EdgeOffset(const int grid_size, const int stream_id, pipe& pipe) {
   constexpr auto n_threads = PrefixSumAgent<int>::n_threads;
   const auto& stream = streams[stream_id];
 
@@ -190,6 +191,11 @@ void dispatch_BuildOctree(const int grid_size,
   constexpr auto block_size = 512;
   const auto& stream = streams[stream_id];
 
+  // for (auto i = 0; i < pipe.n_brt_nodes(); ++i) {
+  //   std::cout << "parent: " << pipe.brt.u_parent[i]
+  //             << " prefix_n: " << (int)pipe.brt.u_prefix_n[i] << std::endl;
+  // }
+
   k_MakeOctNodes<<<grid_size, block_size, 0, stream>>>(
       pipe.oct.u_children,
       pipe.oct.u_corner,
@@ -203,6 +209,8 @@ void dispatch_BuildOctree(const int grid_size,
       pipe.min_coord,
       pipe.range,
       pipe.n_brt_nodes());
+
+  std::cout << "octree built\n";
 }
 
 }  // namespace gpu

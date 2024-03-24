@@ -1,5 +1,7 @@
 #include <device_launch_parameters.h>
 
+#include <cstdio>
+
 #include "cuda/07_octree.cuh"
 #include "shared/oct_func.h"
 
@@ -40,6 +42,7 @@ __global__ void gpu::k_MakeOctNodes(int (*u_children)[8],
     if (i == 0) {
       continue;
     }
+    // printf("i: %d\n", i);
     shared::process_oct_node(static_cast<int>(i),
                              u_children,
                              u_corner,

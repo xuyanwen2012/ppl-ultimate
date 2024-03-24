@@ -25,7 +25,7 @@ void k_binning_pass(const size_t tid,
                     barrier& barrier,
                     const morton_t* u_sort_begin,
                     const morton_t* u_sort_end,
-                    std::vector<morton_t>& u_sort_alt,  // output
+                    morton_t* u_sort_alt,  // output
                     const int shift) {
   // DEBUG_PRINT("[tid ", tid, "] started. (Binning, shift=", shift, ")");
 
@@ -70,11 +70,9 @@ void k_binning_pass(const size_t tid,
 
   lck.unlock();
 
-  std::for_each(u_sort_begin,
-                u_sort_end,
-                [shift, &local_bucket, &u_sort_alt](const morton_t& code) {
-                  u_sort_alt[local_bucket[DIGITS(code, shift)]++] = code;
-                });
+  std::for_each(u_sort_begin, u_sort_end, [&](auto code) {
+    u_sort_alt[local_bucket[DIGITS(code, shift)]++] = code;
+  });
 
   // DEBUG_PRINT("[tid ", tid, "] ended. (Binning, shift=", shift, ")");
 }
@@ -111,6 +109,46 @@ BS::multi_future<void> cpu::dispatch_binning_pass(
                      barrier,
                      u_sort.data() + start,
                      u_sort.data() + end,
+                     u_sort_alt.data(),
+                     shift);
+    }));
+  }
+
+  return future;
+}
+
+BS::multi_future<void> cpu::dispatch_binning_pass(BS::thread_pool& pool,
+                                                  const size_t n_threads,
+                                                  barrier& barrier,
+                                                  const int n,
+                                                  const morton_t* u_sort,
+                                                  morton_t* u_sort_alt,
+                                                  const int shift) {
+  constexpr auto first_index = 0;
+  const auto index_after_last = n;
+
+  const my_blocks blks(first_index, index_after_last, n_threads);
+
+  BS::multi_future<void> future;
+  future.reserve(blks.get_num_blocks());
+
+  std::fill_n(sort.bucket, BASE, 0);
+  sort.current_thread = n_threads - 1;
+
+  // I could have used the simpler API, but I need the 'blk' index for my kernel
+
+  for (size_t blk = 0; blk < blks.get_num_blocks(); ++blk) {
+    future.push_back(pool.submit_task([start = blks.start(blk),
+                                       end = blks.end(blk),
+                                       blk,
+                                       &barrier,
+                                       u_sort,
+                                       u_sort_alt,
+                                       shift] {
+      k_binning_pass(static_cast<int>(blk),
+                     barrier,
+                     u_sort + start,
+                     u_sort + end,
                      u_sort_alt,
                      shift);
     }));
