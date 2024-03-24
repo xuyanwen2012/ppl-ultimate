@@ -6,6 +6,7 @@
 #include <stdexcept>
 
 #include "defines.h"
+#include "shared/morton_func.h"
 
 // I am using only pointers because this gives me a unified front end for both
 // CPU/and GPU
@@ -55,8 +56,6 @@ struct radix_tree {
 };
 
 struct octree {
-#define UNINITIALIZED (-1)
-
   const size_t capacity;
 
   // ------------------------
@@ -100,4 +99,68 @@ struct octree {
       throw std::runtime_error("BRT nodes unset!!!");
     return n_oct_nodes;
   }
+};
+
+struct pipe {
+  // ------------------------
+  // Essential Data (CPU/GPU shared)
+  // ------------------------
+
+  int n_points;
+  int n_unique;
+
+  glm::vec4 *u_points;
+  morton_t *u_morton;
+  morton_t *u_morton_alt;  // also used as the unique morton
+  radix_tree brt;
+  int *u_edge_count;
+  int *u_edge_offset;
+  octree oct;
+
+  // ------------------------
+  // Temporary Storage (for GPU only)
+  // only allocated when GPU is used
+  // ------------------------
+
+  static constexpr auto RADIX = 256;
+  static constexpr auto RADIX_PASSES = 4;
+  static constexpr auto BIN_PART_SIZE = 7680;
+  static constexpr auto BIN_PARTS = 2;
+  static constexpr auto GLOBAL_HIST_THREADS = 128;
+  static constexpr auto BINNING_THREADS = 512;
+
+  size_t binning_blocks;
+
+  struct {
+    unsigned int *d_global_histogram;
+    unsigned int *d_index;
+    unsigned int *d_first_pass_histogram;
+    unsigned int *d_second_pass_histogram;
+    unsigned int *d_third_pass_histogram;
+    unsigned int *d_fourth_pass_histogram;
+    int *u_flag_heads;
+  } im_storage;
+
+  // ------------------------
+  // Constructors
+  // ------------------------
+
+  pipe() = delete;
+
+  explicit pipe(const int n_points);
+
+  pipe(const pipe &) = delete;
+  pipe &operator=(const pipe &) = delete;
+  pipe(pipe &&) = delete;
+  pipe &operator=(pipe &&) = delete;
+
+  ~pipe();
+
+  // ------------------------
+  // Accessors (preffered over direct access)
+  // ------------------------
+  [[nodiscard]] int n_input() const { return n_points; }
+  [[nodiscard]] int n_brt_nodes() const { return brt.n_nodes(); }
+  [[nodiscard]] int n_unique_mortons() const { return n_unique; }
+  [[nodiscard]] int n_oct_nodes() const { return oct.n_nodes(); }
 };

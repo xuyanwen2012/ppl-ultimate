@@ -3,12 +3,12 @@
 // Let's allocate 'capacity' instead of 'n_brt_nodes' for now
 // Because usually n_brt_nodes is 99.x% of capacity
 
-radix_tree::radix_tree(const size_t n_to_allocate) : capacity(n_to_allocate) {
-  u_prefix_n = new uint8_t[n_to_allocate];
-  u_has_leaf_left = new bool[n_to_allocate];
-  u_has_leaf_right = new bool[n_to_allocate];
-  u_left_child = new int[n_to_allocate];
-  u_parent = new int[n_to_allocate];
+radix_tree::radix_tree(const size_t capacity) : capacity(capacity) {
+  u_prefix_n = new uint8_t[capacity];
+  u_has_leaf_left = new bool[capacity];
+  u_has_leaf_right = new bool[capacity];
+  u_left_child = new int[capacity];
+  u_parent = new int[capacity];
 }
 
 radix_tree::~radix_tree() {
@@ -33,4 +33,23 @@ octree::~octree() {
   delete[] u_cell_size;
   delete[] u_child_node_mask;
   delete[] u_child_leaf_mask;
+}
+
+constexpr auto educated_guess = 0.55;
+
+pipe::pipe(const int n) : n_points(n), brt(n), oct(n * educated_guess) {
+  u_points = new glm::vec4[n];
+  u_morton = new morton_t[n];
+  u_morton_alt = new morton_t[n];
+  u_edge_count = new int[n];
+  u_edge_offset = new int[n];
+  // For CPU, no need to allocate the temporary storage
+}
+
+pipe::~pipe() {
+  delete[] u_points;
+  delete[] u_morton;
+  delete[] u_morton_alt;
+  delete[] u_edge_count;
+  delete[] u_edge_offset;
 }
