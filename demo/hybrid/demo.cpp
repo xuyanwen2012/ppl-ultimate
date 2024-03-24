@@ -15,8 +15,8 @@
 
 int demo(const int n_threads) {
   // Problem size
-  // constexpr auto n = 1920 * 1080;  // ~2M
-  constexpr auto n = 1024;  // ~2M
+  constexpr auto n = 1920 * 1080;  // ~2M
+  // constexpr auto n = 1024;
 
   constexpr auto min_coord = 0.0f;
   constexpr auto range = 1024.0f;
@@ -32,11 +32,10 @@ int demo(const int n_threads) {
 
   gpu::initialize_dispatcher(1);
 
-  // gpu::dispatch_ComputeMorton(1, 0, *pipe_ptr);
-
-  std::generate_n(pipe_ptr->u_morton, n, [i = n]() mutable { return --i; });
+  gpu::dispatch_ComputeMorton(1, 0, *pipe_ptr);
 
   gpu::dispatch_RadixSort(1, 0, *pipe_ptr);
+
   gpu::sync_device();
 
   // gpu::sync_stream(0);
@@ -44,10 +43,6 @@ int demo(const int n_threads) {
   const auto is_sorted =
       std::is_sorted(pipe_ptr->u_morton, pipe_ptr->u_morton + n);
   std::cout << "Is sorted: " << std::boolalpha << is_sorted << '\n';
-
-  for (auto i = 0; i < n; ++i) {
-    std::cout << i << ":\t" << pipe_ptr->u_morton[i] << '\n';
-  }
 
   gpu::release_dispatcher();
 
