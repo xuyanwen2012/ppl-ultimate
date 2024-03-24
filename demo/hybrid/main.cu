@@ -1,7 +1,7 @@
 #include <iostream>
 #include <thread>
 
-#include "main.h"
+#include "demo.h"
 #include "third-party/CLI11.hpp"
 
 void printCudaDeviceInfo() {

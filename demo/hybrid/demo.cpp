@@ -12,8 +12,6 @@
 #include "third-party/BS_thread_pool.hpp"
 #include "third-party/BS_thread_pool_utils.hpp"
 
-// int my_main(const int argc, const char *argv[]) {
-
 int demo(const int n_threads) {
   // Problem size
   constexpr auto n = 1920 * 1080;  // ~2M
