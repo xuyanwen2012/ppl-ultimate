@@ -1,0 +1,8 @@
+target("hybrid")
+    set_kind("binary")
+    add_includedirs("$(projectdir)/include")
+    add_files("main.cu")
+    add_packages("glm")
+    add_deps("ppl", "ppl-cuda")
+    add_cxxflags("-pthread")
+    add_cugencodes("native")
