@@ -11,20 +11,10 @@
 // third-party
 #include "third-party/BS_thread_pool.hpp"
 #include "third-party/BS_thread_pool_utils.hpp"
-#include "third-party/CLI11.hpp"
 
-int my_main(const int argc, const char *argv[]) {
-  const auto max_cpu_cores = std::thread::hardware_concurrency();
+// int my_main(const int argc, const char *argv[]) {
 
-  int n_threads = 1;
-
-  CLI::App app{"Demo"};
-
-  app.add_option("-t,--threads", n_threads, "Number of threads")
-      ->check(CLI::Range(1u, max_cpu_cores));
-
-  CLI11_PARSE(app, argc, argv);
-
+int demo(const int n_threads) {
   // Problem size
   constexpr auto n = 1920 * 1080;  // ~2M
   constexpr auto min_coord = 0.0f;

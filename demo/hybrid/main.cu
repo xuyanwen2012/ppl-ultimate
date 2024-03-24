@@ -1,6 +1,8 @@
 #include <iostream>
+#include <thread>
 
 #include "main.h"
+#include "third-party/CLI11.hpp"
 
 void printCudaDeviceInfo() {
   int deviceCount;
@@ -39,5 +41,19 @@ void printCudaDeviceInfo() {
 
 int main(const int argc, const char *argv[]) {
   printCudaDeviceInfo();
-  return my_main(argc, argv);
+
+  const auto max_cpu_cores = std::thread::hardware_concurrency();
+
+  int n_threads = 1;
+
+  CLI::App app{"Demo"};
+
+  app.add_option("-t,--threads", n_threads, "Number of threads")
+      ->check(CLI::Range(1u, max_cpu_cores));
+
+  CLI11_PARSE(app, argc, argv);
+
+  demo(n_threads);
+
+  return 0;
 }
