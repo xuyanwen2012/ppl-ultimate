@@ -3,6 +3,8 @@
 // this is from the BS::thread_pool library.
 // A helper class to divide a range into blocks.
 
+#include <cstddef>
+
 template <typename T>
 class [[nodiscard]] my_blocks {
  public:
