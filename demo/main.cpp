@@ -48,15 +48,14 @@ int main(const int argc, const char *argv[]) {
     return glm::vec4(dis(gen), dis(gen), dis(gen), 1.0f);
   });
 
-  constexpr auto threads = 10;
-
   BS::thread_pool pool;
 
   BS::timer timer;
 
   timer.start();
 
-  cpu::dispatch_morton_code(pool, threads, u_points, u_morton, min_coord, range)
+  cpu::dispatch_morton_code(
+      pool, n_threads, u_points, u_morton, min_coord, range)
       .wait();
 
   timer.stop();
