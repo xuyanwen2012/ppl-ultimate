@@ -14,6 +14,9 @@ constexpr auto min_coord = 0.0f;
 constexpr auto range = 1024.0f;
 constexpr auto seed = 114514;
 
+// Bench mark config
+constexpr auto n_iterations = 20;
+
 void gen_data(const std::unique_ptr<pipe>& p) {
   std::mt19937 gen(seed);  // NOLINT(cert-msc51-cpp)
   std::uniform_real_distribution dis(min_coord, min_coord + range);
@@ -56,7 +59,7 @@ BENCHMARK_DEFINE_F(MyFixture, BM_Morton)(benchmark::State& state) {
 BENCHMARK_REGISTER_F(MyFixture, BM_Morton)
     ->DenseRange(1, 6, 1)
     ->Unit(benchmark::kMillisecond)
-    ->Iterations(10);
+    ->Iterations(n_iterations);
 
 // --------------------------------------------------
 // Sort
@@ -73,7 +76,7 @@ BENCHMARK_DEFINE_F(MyFixture, BM_Sort)(benchmark::State& state) {
 BENCHMARK_REGISTER_F(MyFixture, BM_Sort)
     ->DenseRange(1, 6, 1)
     ->Unit(benchmark::kMillisecond)
-    ->Iterations(10);
+    ->Iterations(n_iterations);
 
 // --------------------------------------------------
 // Unique
@@ -90,6 +93,74 @@ BENCHMARK_DEFINE_F(MyFixture, BM_RemoveDup)(benchmark::State& state) {
 BENCHMARK_REGISTER_F(MyFixture, BM_RemoveDup)
     ->DenseRange(1, 6, 1)
     ->Unit(benchmark::kMillisecond)
-    ->Iterations(10);
+    ->Iterations(n_iterations);
+
+// --------------------------------------------------
+// Radix Tree
+// --------------------------------------------------
+
+BENCHMARK_DEFINE_F(MyFixture, BM_RadixTree)(benchmark::State& state) {
+  const auto n_threads = state.range(0);
+
+  for (auto _ : state) {
+    cpu::dispatch_BuildRadixTree(n_threads, p.get());
+  }
+}
+
+BENCHMARK_REGISTER_F(MyFixture, BM_RadixTree)
+    ->DenseRange(1, 6, 1)
+    ->Unit(benchmark::kMillisecond)
+    ->Iterations(n_iterations);
+
+// --------------------------------------------------
+// Edge Count
+// --------------------------------------------------
+
+BENCHMARK_DEFINE_F(MyFixture, BM_EdgeCount)(benchmark::State& state) {
+  const auto n_threads = state.range(0);
+
+  for (auto _ : state) {
+    cpu::dispatch_EdgeCount(n_threads, p.get());
+  }
+}
+
+BENCHMARK_REGISTER_F(MyFixture, BM_EdgeCount)
+    ->DenseRange(1, 6, 1)
+    ->Unit(benchmark::kMillisecond)
+    ->Iterations(n_iterations);
+
+// --------------------------------------------------
+// Edge Offset
+// --------------------------------------------------
+
+BENCHMARK_DEFINE_F(MyFixture, BM_EdgeOffset)(benchmark::State& state) {
+  const auto n_threads = state.range(0);
+
+  for (auto _ : state) {
+    cpu::dispatch_EdgeOffset(n_threads, p.get());
+  }
+}
+
+BENCHMARK_REGISTER_F(MyFixture, BM_EdgeOffset)
+    ->DenseRange(1, 6, 1)
+    ->Unit(benchmark::kMillisecond)
+    ->Iterations(n_iterations);
+
+// --------------------------------------------------
+// Octree
+// --------------------------------------------------
+
+BENCHMARK_DEFINE_F(MyFixture, BM_Octree)(benchmark::State& state) {
+  const auto n_threads = state.range(0);
+
+  for (auto _ : state) {
+    cpu::dispatch_BuildOctree(n_threads, p.get());
+  }
+}
+
+BENCHMARK_REGISTER_F(MyFixture, BM_Octree)
+    ->DenseRange(1, 6, 1)
+    ->Unit(benchmark::kMillisecond)
+    ->Iterations(n_iterations);
 
 BENCHMARK_MAIN();
