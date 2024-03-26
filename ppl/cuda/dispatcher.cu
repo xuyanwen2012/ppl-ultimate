@@ -1,3 +1,4 @@
+#include <numeric>
 #include <vector>
 
 #include "cuda/01_morton.cuh"
@@ -103,17 +104,17 @@ void dispatch_RadixSort(const int grid_size, const int stream_id, pipe& pipe) {
   sync_device();
 }
 
-void dispatch_RemoveDuplicates_async(const int grid_size,
-                                     const int stream_id,
-                                     pipe& pipe) {}
+// void dispatch_RemoveDuplicates_async(const int grid_size,
+//                                      const int stream_id,
+//                                      pipe& pipe) {}
 
-void RemoveDuplicates_on_complete(const int grid_size,
-                                  const int stream_id,
-                                  pipe& pipe) {
-  SYNC_STREAM(streams[stream_id]);
-  pipe.set_n_unique(pipe.im_storage.u_flag_heads[pipe.n_input() - 1]);
-  pipe.brt.set_n_nodes(pipe.n_unique_mortons() - 1);
-}
+// void RemoveDuplicates_on_complete(const int grid_size,
+//                                   const int stream_id,
+//                                   pipe& pipe) {
+//   SYNC_STREAM(streams[stream_id]);
+//   pipe.set_n_unique(pipe.im_storage.u_flag_heads[pipe.n_input() - 1]);
+//   pipe.brt.set_n_nodes(pipe.n_unique_mortons() - 1);
+// }
 
 void dispatch_RemoveDuplicates_sync(const int grid_size,
                                     const int stream_id,
@@ -129,10 +130,15 @@ void dispatch_RemoveDuplicates_sync(const int grid_size,
       pipe.im_storage.u_flag_heads,  // <-- output
       pipe.n_input());
 
-  k_SingleBlockExclusiveScan<<<1, prefix_block_size, 0, stream>>>(
-      pipe.im_storage.u_flag_heads,
-      pipe.im_storage.u_flag_heads,  // <-- output
-      pipe.n_input());
+  // k_SingleBlockExclusiveScan<<<1, prefix_block_size, 0, stream>>>(
+  //     pipe.im_storage.u_flag_heads,
+  //     pipe.im_storage.u_flag_heads,  // <-- output
+  //     pipe.n_input());
+
+  SYNC_STREAM(stream);
+  std::partial_sum(pipe.im_storage.u_flag_heads,
+                   pipe.im_storage.u_flag_heads + pipe.n_input(),
+                   pipe.im_storage.u_flag_heads);
 
   k_MoveDups<<<grid_size, unique_block_size, 0, stream>>>(
       pipe.getSortedKeys(),
@@ -143,7 +149,8 @@ void dispatch_RemoveDuplicates_sync(const int grid_size,
   SYNC_STREAM(stream);
 
   // last element of flag_heads(prefix summed) is the number of unique elements
-  const auto n_unique = pipe.im_storage.u_flag_heads[pipe.n_input() - 1];
+  // AND Plus 1!!!
+  const auto n_unique = pipe.im_storage.u_flag_heads[pipe.n_input() - 1] + 1;
   pipe.set_n_unique(n_unique);
   pipe.brt.set_n_nodes(n_unique - 1);
 }

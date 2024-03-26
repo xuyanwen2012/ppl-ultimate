@@ -7,6 +7,7 @@
 #include "host/all.hpp"
 #include "host/barrier.hpp"
 #include "shared/morton_func.h"
+#include "shared/oct_func.h"
 #include "shared/structures.h"
 
 // third-party
@@ -129,60 +130,70 @@ int demo(const int n_threads) {
 
   gpu::dispatch_RemoveDuplicates_sync(grid_size, stream_id, *gpu_pip);
 
-  {
-    gpu::sync_device();
-    std::cout << "gpu n_unique = " << gpu_pip->n_unique_mortons() << '\n';
-    std::cout << "cpu n_unique = " << cpu_pip->n_unique_mortons() << '\n';
-    const auto is_equal =
-        std::equal(cpu_pip->u_morton_alt,
-                   cpu_pip->u_morton_alt + gpu_pip->n_unique_mortons(),
-                   gpu_pip->u_morton_alt);
-    std::cout << "Is equal: " << std::boolalpha << is_equal << '\n';
-    // print mistmatches
+  // {
+  //   gpu::sync_device();
+  //   std::cout << "gpu n_unique = " << gpu_pip->n_unique_mortons() << '\n';
+  //   std::cout << "cpu n_unique = " << cpu_pip->n_unique_mortons() << '\n';
+  //   const auto is_equal =
+  //       std::equal(cpu_pip->u_morton_alt,
+  //                  cpu_pip->u_morton_alt + gpu_pip->n_unique_mortons(),
+  //                  gpu_pip->u_morton_alt);
+  //   std::cout << "Is equal: " << std::boolalpha << is_equal << '\n';
+  //   // print mistmatches
 
-    for (auto i = 0; i < gpu_pip->n_unique_mortons(); ++i) {
-      if (cpu_pip->u_morton_alt[i] != gpu_pip->u_morton_alt[i]) {
-        std::cout << "mismatch at " << i << ": " << cpu_pip->u_morton_alt[i]
-                  << " != " << gpu_pip->u_morton_alt[i] << '\n';
-      }
-    }
-  }
+  //   for (auto i = 0; i < gpu_pip->n_unique_mortons(); ++i) {
+  //     if (cpu_pip->u_morton_alt[i] != gpu_pip->u_morton_alt[i]) {
+  //       std::cout << "mismatch at " << i << ": " << cpu_pip->u_morton_alt[i]
+  //                 << " != " << gpu_pip->u_morton_alt[i] << '\n';
+  //     }
+  //   }
+  // }
 
   // std::cout << "Is equal: " << std::boolalpha << is_equal << '\n';
 
   // gpu::dispatch_BuildRadixTree(grid_size, stream_id, *gpu_pip);
-  // gpu::dispatch_EdgeCount(grid_size, stream_id, *gpu_pip);
-  // gpu::dispatch_EdgeOffset(grid_size, stream_id, *gpu_pip);
+  for (auto i = 0; i < gpu_pip->n_unique_mortons(); i++) {
+    process_radix_tree_i(i,
+                         gpu_pip->n_unique_mortons(),
+                         gpu_pip->getSortedKeys(),
+                         &gpu_pip->brt);
+  }
+
+  gpu::dispatch_EdgeCount(grid_size, stream_id, *gpu_pip);
+  gpu::sync_device();
+  gpu::dispatch_EdgeOffset(grid_size, stream_id, *gpu_pip);
 
   // // print each brt node
   // for (auto i = 0; i < gpu_pip->n_brt_nodes(); ++i) {
   //   std::cout << "brt[" << i << "] = " << gpu_pip->brt.u_prefix_n[i] << '\n';
   // }
 
-  // gpu::dispatch_BuildOctree(grid_size, stream_id, *gpu_pip);
+  // // gpu::dispatch_BuildOctree(grid_size, stream_id, *gpu_pip);
+  // for(auto i = 0; i < cpu_pip; < ++i){
+  //   // shared::process_oct_node(
+  // }
 
   // gpu::sync_stream(0);
   gpu::sync_device();
 
-  // timer.stop();
+  timer.stop();
 
-  // gpu_pip->oct.set_n_nodes(gpu_pip->u_edge_offset[gpu_pip->n_brt_nodes() -
-  // 1]);
+  gpu_pip->oct.set_n_nodes(gpu_pip->u_edge_offset[gpu_pip->n_brt_nodes() - 1]);
 
-  // const auto is_sorted =
-  //     std::is_sorted(gpu_pip->u_morton, gpu_pip->u_morton + n);
-  // std::cout << "Is sorted: " << std::boolalpha << is_sorted << '\n';
+  const auto is_sorted =
+      std::is_sorted(gpu_pip->u_morton, gpu_pip->u_morton + n);
+  std::cout << "Is sorted: " << std::boolalpha << is_sorted << '\n';
 
-  // std::cout << "==========================\n";
-  // std::cout << " Total Time spent: " << timer.ms() << " ms\n";
-  // std::cout << " n_unique = " << gpu_pip->n_unique_mortons() << " ("
-  //           << static_cast<double>(gpu_pip->n_unique_mortons()) / n * 100.0
-  //           << "%)\n";
-  // std::cout << " n_brt_nodes = " << gpu_pip->n_brt_nodes() << '\n';
-  // std::cout << " n_octree_nodes = " << gpu_pip->n_oct_nodes() << " ("
-  //           << static_cast<double>(gpu_pip->n_oct_nodes()) / n * 100.0
-  //           << "%)\n";
-  // std::cout << "--------------------------\n";
+  std::cout << "==========================\n";
+  std::cout << " Total Time spent: " << timer.ms() << " ms\n";
+  std::cout << " n_unique = " << gpu_pip->n_unique_mortons() << " ("
+            << static_cast<double>(gpu_pip->n_unique_mortons()) / n * 100.0
+            << "%)\n";
+  std::cout << " n_brt_nodes = " << gpu_pip->n_brt_nodes() << '\n';
+  std::cout << " n_octree_nodes = " << gpu_pip->n_oct_nodes() << " ("
+            << static_cast<double>(gpu_pip->n_oct_nodes()) / n * 100.0
+            << "%)\n";
+  std::cout << "--------------------------\n";
 
   gpu::release_dispatcher();
 
