@@ -1,6 +1,0 @@
-target("cpu-only")
-    set_kind("binary")
-    add_includedirs("$(projectdir)/include")
-    add_files("main.cpp")
-    add_packages("glm", "pthread")
-    add_deps("ppl")

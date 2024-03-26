@@ -1,60 +1,40 @@
-#include <algorithm>
 #include <iostream>
-#include <memory>
-#include <random>
+#include <thread>
 
-#include "host_code.hpp"
-#include "shared/structures.h"
-#include "third-party/BS_thread_pool_utils.hpp"
+#include "demos.cuh"
+#include "third-party/CLI11.hpp"
 
-// Problem size
-constexpr auto n = 1920 * 1080;  // ~2M
-constexpr auto min_coord = 0.0f;
-constexpr auto range = 1024.0f;
-constexpr auto seed = 114514;
+int main(const int argc, const char* argv[]) {
+  int n_threads = 1;
+  int n_grid_size = 4;
+  int demo_id = 0;
 
-void init_data(const std::unique_ptr<pipe>& gpu_pip,
-               const std::unique_ptr<pipe>& cpu_pip) {
-  std::mt19937 gen(seed);  // NOLINT(cert-msc51-cpp)
-  std::uniform_real_distribution dis(min_coord, min_coord + range);
-  std::generate_n(gpu_pip->u_points, n, [&dis, &gen] {
-    return glm::vec4(dis(gen), dis(gen), dis(gen), 1.0f);
-  });
+  const int max_threads = std::thread::hardware_concurrency();
 
-  std::copy(gpu_pip->u_points, gpu_pip->u_points + n, cpu_pip->u_points);
-}
+  CLI::App app{"Demo for new hybrid version"};
 
-int main() {
-  // config
-  constexpr auto n_threads = 2;
+  app.add_option("-t,--threads", n_threads, "Number of threads")
+      ->check(CLI::Range(1, max_threads));
+  app.add_option("-d,--demo", demo_id, "Demo id");
+  app.add_option("-g,--grid", n_grid_size, "Grid size");
 
-  auto gpu_pip = std::make_unique<pipe>(n, min_coord, range, seed);
-  auto cpu_pip = std::make_unique<pipe>(n, min_coord, range, seed);
+  CLI11_PARSE(app, argc, argv);
 
-  init_data(gpu_pip, cpu_pip);
+  std::cout << "Threads: " << n_threads << std::endl;
+  std::cout << "Grid size: " << n_grid_size << std::endl;
+  std::cout << "Demo id: " << demo_id << std::endl;
 
-  BS::timer t;
-
-  t.start();
-
-  cpu::dispatch_ComputeMorton(n_threads, cpu_pip.get());
-  cpu::dispatch_RadixSort(n_threads, cpu_pip.get());
-  cpu::dispatch_RemoveDuplicates(n_threads, cpu_pip.get());
-  cpu::dispatch_BuildRadixTree(n_threads, cpu_pip.get());
-  cpu::dispatch_EdgeCount(n_threads, cpu_pip.get());
-  cpu::dispatch_EdgeOffset(n_threads, cpu_pip.get());
-  cpu::dispatch_BuildOctree(n_threads, cpu_pip.get());
-
-  t.stop();
-
-  const auto is_sorted =
-      std::is_sorted(cpu_pip->u_morton, cpu_pip->u_morton + n);
-  std::cout << "CPU: " << (is_sorted ? "Sorted" : "Not sorted") << '\n';
-
-  std::cout << "# unique: " << cpu_pip->n_unique_mortons() << '\n';
-  std::cout << "# brt_nodes: " << cpu_pip->n_brt_nodes() << '\n';
-
-  std::cout << "Time: " << t.ms() << "ms\n";
+  switch (demo_id) {
+    case 0:
+      demo_cpu_only(n_threads);
+      break;
+    case 1:
+      demo_gpu_only(n_grid_size);
+      break;
+    default:
+      std::cerr << "Invalid demo id" << std::endl;
+      break;
+  }
 
   return 0;
 }
