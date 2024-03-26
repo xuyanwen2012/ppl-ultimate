@@ -7,3 +7,5 @@
 #include "05_edge_count.cuh"
 #include "06_prefix_sum.cuh"
 #include "07_octree.cuh"
+#include "agents/prefix_sum_agent.cuh"
+#include "agents/unique_agent.cuh"

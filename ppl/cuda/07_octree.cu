@@ -1,16 +1,14 @@
 #include <device_launch_parameters.h>
 
-#include <cstdio>
-
 #include "cuda/07_octree.cuh"
 #include "shared/oct_func.h"
 
-__global__ void gpu::k_MakeOctNodes(int (*u_children)[8],
-                                    glm::vec4* u_corner,
-                                    float* u_cell_size,
-                                    int* u_child_node_mask,
-                                    const int* node_offsets,  // prefix sum
-                                    const int* node_counts,   // edge count
+__global__ void gpu::k_MakeOctNodes(int (*oct_children)[8],
+                                    glm::vec4* oct_corner,
+                                    float* oct_cell_size,
+                                    int* oct_child_node_mask,
+                                    const int* edge_offsets,  // prefix sum
+                                    const int* edge_counts,   // edge count
                                     const unsigned int* codes,
                                     const uint8_t* rt_prefix_n,
                                     const int* rt_parents,
@@ -23,11 +21,11 @@ __global__ void gpu::k_MakeOctNodes(int (*u_children)[8],
     const auto root_prefix = codes[0] >> (morton_bits - (3 * root_level));
 
     // compute root's corner
-    shared::morton32_to_xyz(&u_corner[0],
+    shared::morton32_to_xyz(&oct_corner[0],
                             root_prefix << (morton_bits - (3 * root_level)),
                             min_coord,
                             range);
-    u_cell_size[0] = range;
+    oct_cell_size[0] = range;
   }
 
   __syncthreads();
@@ -44,12 +42,12 @@ __global__ void gpu::k_MakeOctNodes(int (*u_children)[8],
     }
     // printf("i: %d\n", i);
     shared::process_oct_node(static_cast<int>(i),
-                             u_children,
-                             u_corner,
-                             u_cell_size,
-                             u_child_node_mask,
-                             node_offsets,
-                             node_counts,
+                             oct_children,
+                             oct_corner,
+                             oct_cell_size,
+                             oct_child_node_mask,
+                             edge_offsets,
+                             edge_counts,
                              codes,
                              rt_prefix_n,
                              rt_parents,
@@ -58,10 +56,10 @@ __global__ void gpu::k_MakeOctNodes(int (*u_children)[8],
   }
 }
 
-__global__ void gpu::k_LinkLeafNodes(int (*u_children)[8],
-                                     int* u_child_leaf_mask,
-                                     const int* node_offsets,
-                                     const int* node_counts,
+__global__ void gpu::k_LinkLeafNodes(int (*oct_children)[8],
+                                     int* oct_child_leaf_mask,
+                                     const int* edge_offsets,
+                                     const int* edge_counts,
                                      const unsigned int* codes,
                                      const bool* rt_has_leaf_left,
                                      const bool* rt_has_leaf_right,
@@ -77,10 +75,10 @@ __global__ void gpu::k_LinkLeafNodes(int (*u_children)[8],
   // i < N
   for (auto i = idx; i < n; i += stride) {
     shared::process_link_leaf(static_cast<int>(i),
-                              u_children,
-                              u_child_leaf_mask,
-                              node_offsets,
-                              node_counts,
+                              oct_children,
+                              oct_child_leaf_mask,
+                              edge_offsets,
+                              edge_counts,
                               codes,
                               rt_has_leaf_left,
                               rt_has_leaf_right,

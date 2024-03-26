@@ -1,5 +1,6 @@
 #include <device_launch_parameters.h>
 
+#include <cstddef>
 #include <cstdint>
 
 // ----------------------------------------------------------------------------
@@ -8,7 +9,6 @@
 // ----------------------------------------------------------------------------
 
 namespace gpu {
-
 struct RadixTreeAgent {
   __device__ __forceinline__ unsigned int ceil_div_u32(const unsigned int a,
                                                        const unsigned int b) {
@@ -35,7 +35,6 @@ struct RadixTreeAgent {
 
   __device__ __forceinline__ void ProcessRadixTreeNode(
       const int i,
-      //   const int n /* n_pts */,
       const unsigned int* codes,
       uint8_t* prefix_n,
       bool* has_leaf_left,
@@ -138,5 +137,4 @@ __global__ void k_BuildRadixTree(const int n_unique,
         i, codes, prefix_n, has_leaf_left, has_leaf_right, left_child, parent);
   }
 }
-
 }  // namespace gpu

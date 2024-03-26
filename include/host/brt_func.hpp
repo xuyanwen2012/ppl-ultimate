@@ -1,8 +1,10 @@
 #pragma once
 
-#include "morton_func.h"
-#include "structures.h"
+#include "cuda_runtime.h"
+#include "shared/morton_func.h"
+#include "shared/structures.h"
 
+namespace cpu {
 #if defined(__GNUC__) || defined(__clang__)
 #define CLZ(x) __builtin_clz(x)
 #elif defined(_MSC_VER)
@@ -12,14 +14,12 @@
 #error "CLZ not supported on this platform"
 #endif
 
-H_D_I
-unsigned int ceil_div_u32(const unsigned int a, const unsigned int b) {
+inline unsigned int ceil_div_u32(const unsigned int a, const unsigned int b) {
   assert(b != 0);
   return (a + b - 1) / b;
 }
 
-H_D_I
-uint8_t delta_u32(const unsigned int a, const unsigned int b) {
+inline uint8_t delta_u32(const unsigned int a, const unsigned int b) {
   [[maybe_unused]] constexpr unsigned int bit1_mask =
       static_cast<unsigned int>(1) << (sizeof(a) * 8 - 1);
   assert((a & bit1_mask) == 0);
@@ -27,8 +27,7 @@ uint8_t delta_u32(const unsigned int a, const unsigned int b) {
   return static_cast<uint8_t>(CLZ(a ^ b) - 1);
 }
 
-H_D_I
-int log2_ceil_u32(const unsigned int x) {
+inline int log2_ceil_u32(const unsigned int x) {
   // Counting from LSB to MSB, number of bits before last '1'
   // This is floor(log(x))
   const auto n_lower_bits = ((8 * sizeof(x)) - CLZ(x) - 1);
@@ -38,11 +37,10 @@ int log2_ceil_u32(const unsigned int x) {
   return static_cast<int>(n_lower_bits + ((1 << n_lower_bits) < x));
 }
 
-H_D_I
-void process_radix_tree_i(const int i,
-                          const int n /*n_brt_nodes*/,
-                          const morton_t *codes,
-                          const radix_tree *out_brt) {
+inline void process_radix_tree_i(const int i,
+                                 const int n /*n_brt_nodes*/,
+                                 const morton_t* codes,
+                                 const radix_tree* out_brt) {
   // 'i' is the iterator within a chunk
   // 'codes' is the base address of the whole data, for each chunk, we need to
   // use the offset 'out_brt' is the base address of the whole data, for each
@@ -54,7 +52,7 @@ void process_radix_tree_i(const int i,
   const auto has_leaf_left = out_brt->u_has_leaf_left;
   const auto has_leaf_right = out_brt->u_has_leaf_right;
   const auto left_child = out_brt->u_left_child;
-  const auto parent = out_brt->u_parent;
+  const auto parent = out_brt->u_parents;
 
   // Determine direction of the range (+1 or -1)
   int d;
@@ -128,3 +126,4 @@ void process_radix_tree_i(const int i,
     parent[gamma + 1] = i;
   }
 }
+}  // namespace cpu

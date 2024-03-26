@@ -6,4 +6,4 @@
 #define H_D_I inline
 #endif
 
-#define UNINITIALIZED (-1)
+constexpr auto UNINITIALIZED = -1;

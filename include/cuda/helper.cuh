@@ -11,24 +11,26 @@
 #endif
 
 template <typename T>
-constexpr void mallocManaged(T **ptr, const size_t num_items) {
-  CHECK_CUDA_CALL(
-      cudaMallocManaged(reinterpret_cast<void **>(ptr), num_items * sizeof(T)));
+constexpr void malloc_managed(T** ptr, const size_t num_items)
+{
+	CHECK_CUDA_CALL(
+		cudaMallocManaged(reinterpret_cast<void **>(ptr), num_items * sizeof(T)));
 }
 
 template <typename T>
-constexpr void mallocDevice(T **ptr, const size_t num_items) {
-  CHECK_CUDA_CALL(
-      cudaMalloc(reinterpret_cast<void **>(ptr), num_items * sizeof(T)));
+constexpr void malloc_device(T** ptr, const size_t num_items)
+{
+	CHECK_CUDA_CALL(
+		cudaMalloc(reinterpret_cast<void **>(ptr), num_items * sizeof(T)));
 }
 
-#define MALLOC_MANAGED(ptr, num_items) mallocManaged(ptr, num_items)
+#define MALLOC_MANAGED(ptr, num_items) malloc_managed(ptr, num_items)
 
-#define MALLOC_DEVICE(ptr, num_items) mallocDevice(ptr, num_items)
+#define MALLOC_DEVICE(ptr, num_items) malloc_device(ptr, num_items)
 
 #define SET_MEM_2_ZERO(ptr, item_count) \
   CHECK_CUDA_CALL(cudaMemsetAsync(      \
-      ptr, 0, sizeof(std::remove_pointer_t<decltype(ptr)>) * item_count))
+      ptr, 0, sizeof(std::remove_pointer_t<decltype(ptr)>) * (item_count)))
 
 #define CUDA_FREE(ptr) CHECK_CUDA_CALL(cudaFree(ptr))
 

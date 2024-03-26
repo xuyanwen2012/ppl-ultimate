@@ -122,10 +122,10 @@ __global__ void k_GlobalHistogram(const unsigned int* sort,
       // 64 threads : 1 histogram in shared memory
 
       // clang-format off
-      unsigned int* s_wavesHistFirst = &s_globalHistFirst[threadIdx.x / 64 * RADIX];
-      unsigned int* s_wavesHistSec = &s_globalHistSec[threadIdx.x / 64 * RADIX];
-      unsigned int* s_wavesHistThird = &s_globalHistThird[threadIdx.x / 64 * RADIX];
-      unsigned int* s_wavesHistFourth = &s_globalHistFourth[threadIdx.x / 64 * RADIX];
+       unsigned int* s_wavesHistFirst = &s_globalHistFirst[threadIdx.x / 64 * RADIX];
+       unsigned int* s_wavesHistSec = &s_globalHistSec[threadIdx.x / 64 * RADIX];
+       unsigned int* s_wavesHistThird = &s_globalHistThird[threadIdx.x / 64 * RADIX];
+       unsigned int* s_wavesHistFourth = &s_globalHistFourth[threadIdx.x / 64 * RADIX];
       // clang-format on
 
       if (yanwen_block_id < logicalBlocks - 1) {

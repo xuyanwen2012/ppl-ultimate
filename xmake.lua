@@ -11,4 +11,5 @@ if is_plat("linux") then
 end
 
 includes("ppl")
-includes("demo")
+includes("tests")
+-- includes("demo")

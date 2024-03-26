@@ -11,7 +11,7 @@ radix_tree::radix_tree(const size_t capacity) : capacity(capacity) {
   MALLOC_MANAGED(&u_has_leaf_left, capacity);
   MALLOC_MANAGED(&u_has_leaf_right, capacity);
   MALLOC_MANAGED(&u_left_child, capacity);
-  MALLOC_MANAGED(&u_parent, capacity);
+  MALLOC_MANAGED(&u_parents, capacity);
 }
 
 radix_tree::~radix_tree() {
@@ -19,7 +19,7 @@ radix_tree::~radix_tree() {
   CUDA_FREE(u_has_leaf_left);
   CUDA_FREE(u_has_leaf_right);
   CUDA_FREE(u_left_child);
-  CUDA_FREE(u_parent);
+  CUDA_FREE(u_parents);
 }
 
 octree::octree(const size_t capacity) : capacity(capacity) {
@@ -54,8 +54,8 @@ pipe::pipe(const int n,
   MALLOC_MANAGED(&u_points, n);
   MALLOC_MANAGED(&u_morton, n);
   MALLOC_MANAGED(&u_morton_alt, n);
-  MALLOC_MANAGED(&u_edge_count, n);
-  MALLOC_MANAGED(&u_edge_offset, n);
+  MALLOC_MANAGED(&u_edge_counts, n);
+  MALLOC_MANAGED(&u_edge_offsets, n);
 
   // binning_blocks = 270 usually (w/ ~2M points)
   MALLOC_DEVICE(&im_storage.d_global_histogram, RADIX * RADIX_PASSES);
@@ -74,8 +74,8 @@ pipe::~pipe() {
   CUDA_FREE(u_points);
   CUDA_FREE(u_morton);
   CUDA_FREE(u_morton_alt);
-  CUDA_FREE(u_edge_count);
-  CUDA_FREE(u_edge_offset);
+  CUDA_FREE(u_edge_counts);
+  CUDA_FREE(u_edge_offsets);
 
   CUDA_FREE(im_storage.d_global_histogram);
   CUDA_FREE(im_storage.d_index);
