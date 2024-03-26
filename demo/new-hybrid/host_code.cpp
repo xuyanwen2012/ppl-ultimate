@@ -60,14 +60,40 @@ void dispatch_RadixSort(int n_threads, struct pipe* p) {
       .wait();
 }
 
-void dispatch_RemoveDuplicates(int n_threads, struct pipe* p);
+void dispatch_RemoveDuplicates(int n_threads, struct pipe* p) {
+  auto unique_future =
+      cpu::dispatch_unique(pool, p->n_input(), p->u_morton, p->u_morton_alt);
+  auto n_unique = unique_future.get();
+  p->set_n_unique(n_unique);
+  p->brt.set_n_nodes(n_unique - 1);
+}
 
-void dispatch_BuildRadixTree(int n_threads, struct pipe* p);
+void dispatch_BuildRadixTree(int n_threads, struct pipe* p) {
+  cpu::dispatch_build_radix_tree(pool, n_threads, p->u_morton_alt, &p->brt)
+      .wait();
+}
 
-void dispatch_EdgeCount(int n_threads, struct pipe* p);
+void dispatch_EdgeCount(int n_threads, struct pipe* p) {
+  cpu::dispatch_edge_count(pool, n_threads, &p->brt, p->u_edge_counts).wait();
+}
 
-void dispatch_EdgeOffset(int n_threads, struct pipe* p);
+void dispatch_EdgeOffset(int n_threads, struct pipe* p) {
+  cpu::dispatch_edge_offset(
+      pool, n_threads, p->u_edge_counts, p->u_edge_offsets)
+      .wait();
+}
 
-void dispatch_BuildOctree(int n_threads, struct pipe* p);
+void dispatch_BuildOctree(int n_threads, struct pipe* p) {
+  cpu::dispatch_build_octree(pool,
+                             n_threads,
+                             p->u_edge_counts,
+                             p->u_edge_offsets,
+                             p->getUniqueKeys(),
+                             p->brt,
+                             p->oct,
+                             p->min_coord,
+                             p->range)
+      .wait();
+}
 
 }  // namespace cpu

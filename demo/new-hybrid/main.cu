@@ -39,12 +39,20 @@ int main() {
 
   cpu::dispatch_ComputeMorton(n_threads, cpu_pip.get());
   cpu::dispatch_RadixSort(n_threads, cpu_pip.get());
+  cpu::dispatch_RemoveDuplicates(n_threads, cpu_pip.get());
+  cpu::dispatch_BuildRadixTree(n_threads, cpu_pip.get());
+  cpu::dispatch_EdgeCount(n_threads, cpu_pip.get());
+  cpu::dispatch_EdgeOffset(n_threads, cpu_pip.get());
+  cpu::dispatch_BuildOctree(n_threads, cpu_pip.get());
 
   t.stop();
 
   const auto is_sorted =
       std::is_sorted(cpu_pip->u_morton, cpu_pip->u_morton + n);
   std::cout << "CPU: " << (is_sorted ? "Sorted" : "Not sorted") << '\n';
+
+  std::cout << "# unique: " << cpu_pip->n_unique_mortons() << '\n';
+  std::cout << "# brt_nodes: " << cpu_pip->n_brt_nodes() << '\n';
 
   std::cout << "Time: " << t.ms() << "ms\n";
 

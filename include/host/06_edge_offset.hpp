@@ -15,6 +15,19 @@ namespace cpu {
 [[nodiscard]] inline std::future<int> dispatch_edge_offset(
     BS::thread_pool& pool,
     const int n_brt_nodes,
+    const int* edge_count,
+    int* edge_offset) {
+  // should not use ".end()", we allocated more than actual data
+  // we need to use our own "n_brt_nodes"
+  return pool.submit_task([&] {
+    std::partial_sum(edge_count, edge_count + n_brt_nodes, edge_offset);
+    return edge_offset[n_brt_nodes - 1];
+  });
+}
+
+[[nodiscard]] inline std::future<int> dispatch_edge_offset(
+    BS::thread_pool& pool,
+    const int n_brt_nodes,
     const std::vector<int>& edge_count,
     std::vector<int>& edge_offset) {
   // should not use ".end()", we allocated more than actual data
