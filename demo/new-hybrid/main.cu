@@ -38,12 +38,13 @@ int main() {
   t.start();
 
   cpu::dispatch_ComputeMorton(n_threads, cpu_pip.get());
+  cpu::dispatch_RadixSort(n_threads, cpu_pip.get());
 
   t.stop();
 
-  for (auto i = 0; i < 32; ++i) {
-    std::cout << i << "\t" << cpu_pip->u_morton[i] << std::endl;
-  }
+  const auto is_sorted =
+      std::is_sorted(cpu_pip->u_morton, cpu_pip->u_morton + n);
+  std::cout << "CPU: " << (is_sorted ? "Sorted" : "Not sorted") << '\n';
 
   std::cout << "Time: " << t.ms() << "ms\n";
 

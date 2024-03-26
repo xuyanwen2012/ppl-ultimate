@@ -6,7 +6,9 @@
 
 namespace cpu {
 
+// by default it uses maximum number of threads on the System, great!
 BS::thread_pool pool;
+barrier* sort_barrier = nullptr;  // need to be initialized
 
 void dispatch_ComputeMorton(int n_threads, struct pipe* p) {
   cpu::dispatch_morton_code(pool,
@@ -19,7 +21,44 @@ void dispatch_ComputeMorton(int n_threads, struct pipe* p) {
       .wait();
 }
 
-void dispatch_RadixSort(int n_threads, struct pipe* p);
+void dispatch_RadixSort(int n_threads, struct pipe* p) {
+  if (sort_barrier == nullptr) {
+    sort_barrier = new barrier(n_threads);
+  }
+
+  cpu::dispatch_binning_pass(pool,
+                             n_threads,
+                             *sort_barrier,
+                             p->n_input(),
+                             p->u_morton,
+                             p->u_morton_alt,
+                             0)
+      .wait();
+  cpu::dispatch_binning_pass(pool,
+                             n_threads,
+                             *sort_barrier,
+                             p->n_input(),
+                             p->u_morton_alt,
+                             p->u_morton,
+                             8)
+      .wait();
+  cpu::dispatch_binning_pass(pool,
+                             n_threads,
+                             *sort_barrier,
+                             p->n_input(),
+                             p->u_morton,
+                             p->u_morton_alt,
+                             16)
+      .wait();
+  cpu::dispatch_binning_pass(pool,
+                             n_threads,
+                             *sort_barrier,
+                             p->n_input(),
+                             p->u_morton_alt,
+                             p->u_morton,
+                             24)
+      .wait();
+}
 
 void dispatch_RemoveDuplicates(int n_threads, struct pipe* p);
 
