@@ -24,7 +24,6 @@ int demo(const int n_threads) {
   constexpr auto seed = 114514;
 
   auto gpu_pip = std::make_unique<pipe>(n, min_coord, range, seed);
-
   auto cpu_pip = std::make_unique<pipe>(n, min_coord, range, seed);
 
   std::mt19937 gen(seed);  // NOLINT(cert-msc51-cpp)

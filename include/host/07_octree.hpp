@@ -13,7 +13,7 @@ namespace cpu {
 [[nodiscard]] inline BS::multi_future<void> dispatch_build_octree(
     BS::thread_pool& pool,
     const size_t n_desired_threads,
-    const std::vector<int>& edge_count,
+    const std::vector<int>& edge_count,    
     const std::vector<int>& edge_offset,
     const std::vector<morton_t>& sorted_unique_morton,
     const std::unique_ptr<radix_tree>& radix_tree,

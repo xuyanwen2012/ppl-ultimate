@@ -1,2 +1,5 @@
-includes("cpu-only")
-includes("hybrid")
+-- includes("cpu-only")
+-- includes("hybrid")
+
+
+includes("new-hybrid")
