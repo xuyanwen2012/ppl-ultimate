@@ -34,7 +34,7 @@ namespace cpu {
                                    edge_count.data(),
                                    sorted_unique_morton.data(),
                                    radix_tree->u_prefix_n,
-                                   radix_tree->u_parent,
+                                   radix_tree->u_parents,
                                    min_coord,
                                    range);
         }

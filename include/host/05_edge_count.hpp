@@ -22,7 +22,7 @@ namespace cpu {
         for (auto i = start; i < end; ++i) {
           shared::process_edge_count_i(i,
                                        radix_tree->u_prefix_n,
-                                       radix_tree->u_parent,
+                                       radix_tree->u_parents,
                                        edge_count.data());
         }
       },

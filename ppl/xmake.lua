@@ -10,7 +10,8 @@ target("ppl-hybrid")
     add_includedirs("$(projectdir)/include")
     add_files(
         "cuda/*.cu",
-        "host/sort.cpp"
+        "host/02_sort.cpp",
+        "host/dispatcher.cpp"
         -- Must exclude "host/structures.cpp"
         )
     add_packages("glm")
