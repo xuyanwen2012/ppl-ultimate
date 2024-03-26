@@ -12,11 +12,11 @@ namespace cpu {
 // this will return the number of octree nodes
 // ---------------------------------------------------------------------
 
-[[nodiscard]]
-inline std::future<int> dispatch_edge_offset(BS::thread_pool& pool,
-                                             const int n_brt_nodes,
-                                             const std::vector<int>& edge_count,
-                                             std::vector<int>& edge_offset) {
+[[nodiscard]] inline std::future<int> dispatch_edge_offset(
+    BS::thread_pool& pool,
+    const int n_brt_nodes,
+    const std::vector<int>& edge_count,
+    std::vector<int>& edge_offset) {
   // should not use ".end()", we allocated more than actual data
   // we need to use our own "n_brt_nodes"
   return pool.submit_task([&] {

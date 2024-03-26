@@ -15,9 +15,8 @@ class [[nodiscard]] my_blocks {
    * @param index_after_last_ The index after the last index in the range.
    * @param num_blocks_ The desired number of blocks to divide the range into.
    */
-  my_blocks(const T first_index_,
-            const T index_after_last_,
-            const size_t num_blocks_)
+  my_blocks(
+      const T first_index_, const T index_after_last_, const size_t num_blocks_)
       : first_index(first_index_),
         index_after_last(index_after_last_),
         num_blocks(num_blocks_) {

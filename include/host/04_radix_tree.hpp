@@ -1,6 +1,6 @@
 #pragma once
 
-#include "shared/brt_func.h"
+#include "brt_func.hpp"
 #include "third-party/BS_thread_pool.hpp"
 
 namespace cpu {

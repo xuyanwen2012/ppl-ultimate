@@ -8,7 +8,7 @@ radix_tree::radix_tree(const size_t capacity) : capacity(capacity) {
   u_has_leaf_left = new bool[capacity];
   u_has_leaf_right = new bool[capacity];
   u_left_child = new int[capacity];
-  u_parent = new int[capacity];
+  u_parents = new int[capacity];
 }
 
 radix_tree::~radix_tree() {
@@ -16,7 +16,7 @@ radix_tree::~radix_tree() {
   delete[] u_has_leaf_left;
   delete[] u_has_leaf_right;
   delete[] u_left_child;
-  delete[] u_parent;
+  delete[] u_parents;
 }
 
 octree::octree(const size_t capacity) : capacity(capacity) {
@@ -50,8 +50,8 @@ pipe::pipe(const int n,
   u_points = new glm::vec4[n];
   u_morton = new morton_t[n];
   u_morton_alt = new morton_t[n];
-  u_edge_count = new int[n];
-  u_edge_offset = new int[n];
+  u_edge_counts = new int[n];
+  u_edge_offsets = new int[n];
   // For CPU, no need to allocate the temporary storage
 }
 
@@ -59,8 +59,8 @@ pipe::~pipe() {
   delete[] u_points;
   delete[] u_morton;
   delete[] u_morton_alt;
-  delete[] u_edge_count;
-  delete[] u_edge_offset;
+  delete[] u_edge_counts;
+  delete[] u_edge_offsets;
 }
 
 void pipe::clearSmem() {

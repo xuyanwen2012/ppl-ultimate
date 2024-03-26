@@ -10,8 +10,7 @@ namespace cpu {
 // Octree (1->1 relation, but has a lot of input)
 // ---------------------------------------------------------------------
 
-[[nodiscard]]
-inline BS::multi_future<void> dispatch_build_octree(
+[[nodiscard]] inline BS::multi_future<void> dispatch_build_octree(
     BS::thread_pool& pool,
     const size_t n_desired_threads,
     const std::vector<int>& edge_count,

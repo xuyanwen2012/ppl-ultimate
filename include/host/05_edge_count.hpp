@@ -10,8 +10,7 @@ namespace cpu {
 // Edge Count (1->1 relation)
 // ---------------------------------------------------------------------
 
-[[nodiscard]]
-inline BS::multi_future<void> dispatch_edge_count(
+[[nodiscard]] inline BS::multi_future<void> dispatch_edge_count(
     BS::thread_pool& pool,
     const size_t n_desired_threads,
     const std::unique_ptr<radix_tree>& radix_tree,

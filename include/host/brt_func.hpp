@@ -1,6 +1,5 @@
 #pragma once
 
-#include "cuda_runtime.h"
 #include "shared/morton_func.h"
 #include "shared/structures.h"
 
