@@ -13,3 +13,4 @@ end
 includes("ppl")
 includes("tests")
 includes("demo")
+includes("benchmarks")

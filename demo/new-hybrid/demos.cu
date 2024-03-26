@@ -107,21 +107,9 @@ void demo_gpu_only(const int grid_size) {
 }
 
 void demo_cpu_gpu_independent(int n_threads, int grid_size) {
-  auto cpu_p = std::make_unique<pipe>(n, min_coord, range, seed);
-  auto gpu_p = std::make_unique<pipe>(n, min_coord, range, seed);
-
-  constexpr auto n_streams = 1;
-  gpu::initialize_dispatcher(n_streams);
-
-  gen_data(cpu_p);
-  std::copy(cpu_p->u_points, cpu_p->u_points + n, gpu_p->u_points);
-
-  BS::timer t;
-  t.start();
-
-  std::cout << '\n';
-
-  t.stop();
+  // basically,
+  // during CPU iteration, we can do 2 gpu iterations.
+  // this give us additional 2x speedup.
 }
 
 void demo_simple_cpu_gpu_coarse(const int n_threads, const int grid_size) {
@@ -134,31 +122,31 @@ void demo_simple_cpu_gpu_coarse(const int n_threads, const int grid_size) {
   gen_data(cpu_p);
   std::copy(cpu_p->u_points, cpu_p->u_points + n, gpu_p->u_points);
 
-  BS::timer t;
-  t.start();
+  // BS::timer t;
+  // t.start();
 
-  std::cout << "staring 2-stage CPU/GPU coarse-grained demo" << std::endl;
-  for (auto i = 0; i < n_iterations; ++i) {
-    constexpr auto stream_id = 0;
-    gpu::dispatch_ComputeMorton(grid_size, stream_id, p.get());
-    gpu::dispatch_RadixSort(grid_size, stream_id, p.get());
-    gpu::dispatch_RemoveDuplicates_sync(grid_size, stream_id, p.get());
-    gpu::dispatch_BuildRadixTree(grid_size, stream_id, p.get());
-    gpu::dispatch_EdgeCount(grid_size, stream_id, p.get());
-    gpu::dispatch_EdgeOffset(grid_size, stream_id, p.get());
-    gpu::dispatch_BuildOctree(grid_size, stream_id, p.get());
-    gpu::sync_stream(stream_id);
+  // std::cout << "staring 2-stage CPU/GPU coarse-grained demo" << std::endl;
+  // for (auto i = 0; i < n_iterations; ++i) {
+  //   constexpr auto stream_id = 0;
+  //   gpu::dispatch_ComputeMorton(grid_size, stream_id, p.get());
+  //   gpu::dispatch_RadixSort(grid_size, stream_id, p.get());
+  //   gpu::dispatch_RemoveDuplicates_sync(grid_size, stream_id, p.get());
+  //   gpu::dispatch_BuildRadixTree(grid_size, stream_id, p.get());
+  //   gpu::dispatch_EdgeCount(grid_size, stream_id, p.get());
+  //   gpu::dispatch_EdgeOffset(grid_size, stream_id, p.get());
+  //   gpu::dispatch_BuildOctree(grid_size, stream_id, p.get());
+  //   gpu::sync_stream(stream_id);
 
-    std::cout << '.' << std::flush;
-  }
-  std::cout << '\n';
+  //   std::cout << '.' << std::flush;
+  // }
+  // std::cout << '\n';
 
-  t.stop();
+  // t.stop();
 
-  // print total time and average time, 't.ms()'
+  // // print total time and average time, 't.ms()'
 
-  std::cout << "GPU only Total: " << t.ms() << "ms" << std::endl;
-  std::cout << "Average: " << t.ms() / n_iterations << "ms" << std::endl;
+  // std::cout << "GPU only Total: " << t.ms() << "ms" << std::endl;
+  // std::cout << "Average: " << t.ms() / n_iterations << "ms" << std::endl;
 
-  void release_dispatcher();
+  // void release_dispatcher();
 }
