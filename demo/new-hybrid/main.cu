@@ -31,6 +31,9 @@ int main(const int argc, const char* argv[]) {
     case 1:
       demo_gpu_only(n_grid_size);
       break;
+    case 2:
+      demo_simple_cpu_gpu_coarse(n_threads, n_grid_size);
+      break;
     default:
       std::cerr << "Invalid demo id" << std::endl;
       break;
