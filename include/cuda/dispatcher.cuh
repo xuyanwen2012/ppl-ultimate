@@ -15,7 +15,9 @@ void dispatch_ComputeMorton(int grid_size, int stream_id, struct pipe* p);
 
 void dispatch_RadixSort(int grid_size, int stream_id, struct pipe* p);
 
-void dispatch_RemoveDuplicates_sync(int grid_size, int stream_id, struct pipe* p);
+void dispatch_RemoveDuplicates_sync(int grid_size,
+                                    int stream_id,
+                                    struct pipe* p);
 
 void dispatch_BuildRadixTree(int grid_size, int stream_id, struct pipe* p);
 

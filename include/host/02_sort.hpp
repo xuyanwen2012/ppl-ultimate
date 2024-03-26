@@ -10,14 +10,6 @@ namespace cpu {
 // Radix Sort (challenging)
 // ---------------------------------------------------------------------
 
-[[nodiscard, deprecated]] BS::multi_future<void> dispatch_binning_pass(
-    BS::thread_pool& pool,
-    const size_t n_threads,
-    barrier& barrier,
-    const std::vector<morton_t>& u_sort,
-    std::vector<morton_t>& u_sort_alt,
-    const int shift);
-
 [[nodiscard]] BS::multi_future<void> dispatch_binning_pass(
     BS::thread_pool& pool,
     const size_t n_threads,
