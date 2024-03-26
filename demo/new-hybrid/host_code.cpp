@@ -84,15 +84,23 @@ void dispatch_EdgeOffset(int n_threads, struct pipe* p) {
 }
 
 void dispatch_BuildOctree(int n_threads, struct pipe* p) {
-  cpu::dispatch_build_octree(pool,
-                             n_threads,
-                             p->u_edge_counts,
-                             p->u_edge_offsets,
-                             p->getUniqueKeys(),
-                             p->brt,
-                             p->oct,
-                             p->min_coord,
-                             p->range)
+  cpu::dispatch_make_oct_node(pool,
+                              n_threads,
+                              p->u_edge_offsets,
+                              p->u_edge_counts,
+                              p->getUniqueKeys(),
+                              p->brt,
+                              p->oct,
+                              p->min_coord,
+                              p->range)
+      .wait();
+  cpu::dispatch_link_leaf(pool,
+                          n_threads,
+                          p->u_edge_offsets,
+                          p->u_edge_counts,
+                          p->getUniqueKeys(),
+                          p->brt,
+                          p->oct)
       .wait();
 }
 

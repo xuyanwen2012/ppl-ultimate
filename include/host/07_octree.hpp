@@ -10,18 +10,18 @@ namespace cpu {
 // Octree (1->1 relation, but has a lot of input)
 // ---------------------------------------------------------------------
 
-[[nodiscard]] inline BS::multi_future<void> dispatch_build_octree(
+[[nodiscard]] inline BS::multi_future<void> dispatch_make_oct_node(
     BS::thread_pool& pool,
     const size_t n_desired_threads,
-    const int* edge_count,
     const int* edge_offset,
+    const int* edge_count,
     const morton_t* sorted_unique_morton,
     const radix_tree& radix_tree,
     const octree& octree,  // output
     const float min_coord,
     const float range) {
   return pool.submit_blocks(
-      0,
+      1,  // making sure for cpu, skip the root node
       radix_tree.n_nodes(),
       [&](const int start, const int end) {
         for (auto i = start; i < end; ++i) {
@@ -37,6 +37,36 @@ namespace cpu {
                                    radix_tree.u_parents,
                                    min_coord,
                                    range);
+        }
+      },
+      n_desired_threads);
+}
+
+[[nodiscard]] inline BS::multi_future<void> dispatch_link_leaf(
+    BS::thread_pool& pool,
+    const size_t n_desired_threads,
+    const int* edge_offset,
+    const int* edge_count,
+    const morton_t* sorted_unique_morton,
+    const radix_tree& radix_tree,
+    const octree& octree  // output
+) {
+  return pool.submit_blocks(
+      0,
+      radix_tree.n_nodes(),
+      [&](const int start, const int end) {
+        for (auto i = start; i < end; ++i) {
+          shared::process_link_leaf(i,
+                                    octree.u_children,
+                                    octree.u_child_leaf_mask,
+                                    edge_offset,
+                                    edge_count,
+                                    sorted_unique_morton,
+                                    radix_tree.u_has_leaf_left,
+                                    radix_tree.u_has_leaf_right,
+                                    radix_tree.u_prefix_n,
+                                    radix_tree.u_parents,
+                                    radix_tree.u_left_child);
         }
       },
       n_desired_threads);
