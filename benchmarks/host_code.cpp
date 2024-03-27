@@ -8,54 +8,32 @@ namespace cpu {
 // by default it uses maximum number of threads on the System, great!
 BS::thread_pool pool;
 
+void init(int n_threads) { pool.reset(n_threads); }
+
 void dispatch_ComputeMorton(const int n_threads, pipe* p) {
-  auto ret1 = cpu::dispatch_morton_code(pool,
-                                        n_threads,
-                                        p->n_input(),
-                                        p->u_points,
-                                        p->u_morton,
-                                        p->min_coord,
-                                        p->range);
+  cpu::dispatch_morton_code(pool,
+                            n_threads,
+                            p->n_input(),
+                            p->u_points,
+                            p->u_morton,
+                            p->min_coord,
+                            p->range)
+      .wait();
 }
 
 void dispatch_RadixSort(const int n_threads, pipe* p) {
   barrier bar(n_threads);
-
   dispatch_binning_pass(
-          pool,
-          n_threads,
-          bar,
-          p->n_input(),
-          p->u_morton,
-          p->u_morton_alt,
-          0)
+      pool, n_threads, bar, p->n_input(), p->u_morton, p->u_morton_alt, 0)
       .wait();
   dispatch_binning_pass(
-          pool,
-          n_threads,
-          bar,
-          p->n_input(),
-          p->u_morton_alt,
-          p->u_morton,
-          8)
+      pool, n_threads, bar, p->n_input(), p->u_morton_alt, p->u_morton, 8)
       .wait();
   dispatch_binning_pass(
-          pool,
-          n_threads,
-          bar,
-          p->n_input(),
-          p->u_morton,
-          p->u_morton_alt,
-          16)
+      pool, n_threads, bar, p->n_input(), p->u_morton, p->u_morton_alt, 16)
       .wait();
   dispatch_binning_pass(
-          pool,
-          n_threads,
-          bar,
-          p->n_input(),
-          p->u_morton_alt,
-          p->u_morton,
-          24)
+      pool, n_threads, bar, p->n_input(), p->u_morton_alt, p->u_morton, 24)
       .wait();
 }
 
@@ -68,8 +46,7 @@ void dispatch_RemoveDuplicates(const int n_threads, pipe* p) {
 }
 
 void dispatch_BuildRadixTree(const int n_threads, pipe* p) {
-  dispatch_build_radix_tree(pool, n_threads, p->u_morton_alt, &p->brt)
-      .wait();
+  dispatch_build_radix_tree(pool, n_threads, p->u_morton_alt, &p->brt).wait();
 }
 
 void dispatch_EdgeCount(const int n_threads, pipe* p) {
@@ -77,11 +54,7 @@ void dispatch_EdgeCount(const int n_threads, pipe* p) {
 }
 
 void dispatch_EdgeOffset(const int n_threads, pipe* p) {
-  dispatch_edge_offset(
-          pool,
-          n_threads,
-          p->u_edge_counts,
-          p->u_edge_offsets)
+  dispatch_edge_offset(pool, n_threads, p->u_edge_counts, p->u_edge_offsets)
       .wait();
 }
 
@@ -105,4 +78,4 @@ void dispatch_BuildOctree(const int n_threads, pipe* p) {
                      p->oct)
       .wait();
 }
-} // namespace cpu
+}  // namespace cpu

@@ -16,7 +16,7 @@ constexpr auto range = 1024.0f;
 constexpr auto seed = 114514;
 
 // Bench mark config
-constexpr auto n_iterations = 20;
+constexpr auto n_iterations = 50;
 
 void gen_data(const std::unique_ptr<struct pipe>& p) {
   std::mt19937 gen(seed);  // NOLINT(cert-msc51-cpp)

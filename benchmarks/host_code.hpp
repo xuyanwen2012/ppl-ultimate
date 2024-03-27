@@ -4,6 +4,8 @@
 
 namespace cpu {
 
+    void init();
+
 void dispatch_ComputeMorton(int n_threads, struct pipe* p);
 
 void dispatch_RadixSort(int n_threads, struct pipe* p);
