@@ -9,7 +9,8 @@ int main(const int argc, const char* argv[]) {
   int n_grid_size = 4;
   int demo_id = 0;
 
-  const auto max_threads = static_cast<int>(std::thread::hardware_concurrency());
+  const auto max_threads =
+      static_cast<int>(std::thread::hardware_concurrency());
 
   CLI::App app{"Demo for new hybrid version"};
 

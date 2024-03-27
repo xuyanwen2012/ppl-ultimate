@@ -6,8 +6,7 @@
 #include <random>
 #include <thread>
 
-// #include "host/dispatcher.hpp"
-#include "host_code.hpp"
+#include "host/dispatcher.hpp"
 
 // Problem size
 constexpr auto n = 640 * 480;  // ~300k
