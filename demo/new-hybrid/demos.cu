@@ -4,7 +4,7 @@
 #include <random>
 
 #include "cuda/dispatcher.cuh"
-#include "host_code.hpp"
+#include "host/dispatcher.hpp"
 #include "shared/structures.h"
 #include "third-party/BS_thread_pool_utils.hpp"
 #include "third-party/CLI11.hpp"
@@ -27,6 +27,7 @@ void gen_data(const std::unique_ptr<pipe>& p) {
   });
 }
 
+// for ~2M inputs
 // 1: ~259 ms
 // 2: ~134 ms
 // 3: ~95 ms
@@ -65,6 +66,7 @@ void demo_cpu_only(const int n_threads) {
   std::cout << "Average: " << t.ms() / n_iterations << "ms" << '\n';
 }
 
+// for ~2M inputs
 // 1: ~187 ms
 // 2: ~104 ms
 // 4: ~62 ms

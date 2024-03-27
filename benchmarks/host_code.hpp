@@ -4,7 +4,7 @@
 
 namespace cpu {
 
-    void init();
+void init();
 
 void dispatch_ComputeMorton(int n_threads, struct pipe* p);
 
