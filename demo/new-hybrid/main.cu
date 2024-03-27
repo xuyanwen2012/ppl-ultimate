@@ -18,7 +18,7 @@ int main(const int argc, const char* argv[]) {
   app.add_option("-d,--demo", demo_id, "Demo id");
   app.add_option("-g,--grid", n_grid_size, "Grid size");
 
-  CLI11_PARSE(app, argc, argv);
+  CLI11_PARSE(app, argc, argv)
 
   std::cout << "Threads: " << n_threads << '\n';
   std::cout << "Grid size: " << n_grid_size << '\n';
