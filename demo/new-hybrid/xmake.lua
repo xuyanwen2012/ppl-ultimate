@@ -1,7 +1,7 @@
 target("new-hybrid")
     set_kind("binary")
     add_includedirs("$(projectdir)/include")
-    add_files("*.cu")
+    add_files("*.cu", "*.cpp")
     add_packages("glm")
     if(is_plat("linux")) then
         add_packages("pthread")
