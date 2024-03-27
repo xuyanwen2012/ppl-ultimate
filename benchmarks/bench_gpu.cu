@@ -9,7 +9,8 @@
 #include "cuda_bm_timer.cuh"
 
 // Problem size
-constexpr auto n = 1920 * 1080;  // ~2M
+// constexpr auto n = 1920 * 1080;  // ~2M
+constexpr auto n = 640 * 480;
 constexpr auto min_coord = 0.0f;
 constexpr auto range = 1024.0f;
 constexpr auto seed = 114514;

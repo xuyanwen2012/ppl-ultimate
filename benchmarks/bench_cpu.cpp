@@ -9,7 +9,8 @@
 #include "host_code.hpp"
 
 // Problem size
-constexpr auto n = 1920 * 1080;  // ~2M
+constexpr auto n = 640 * 480;  // ~300k
+// constexpr auto n = 1920 * 1080;  // ~2M
 constexpr auto min_coord = 0.0f;
 constexpr auto range = 1024.0f;
 constexpr auto seed = 114514;
