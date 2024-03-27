@@ -9,7 +9,7 @@ int main(const int argc, const char* argv[]) {
   int n_grid_size = 4;
   int demo_id = 0;
 
-  const int max_threads = std::thread::hardware_concurrency();
+  const auto max_threads = static_cast<int>(std::thread::hardware_concurrency());
 
   CLI::App app{"Demo for new hybrid version"};
 
@@ -20,9 +20,9 @@ int main(const int argc, const char* argv[]) {
 
   CLI11_PARSE(app, argc, argv);
 
-  std::cout << "Threads: " << n_threads << std::endl;
-  std::cout << "Grid size: " << n_grid_size << std::endl;
-  std::cout << "Demo id: " << demo_id << std::endl;
+  std::cout << "Threads: " << n_threads << '\n';
+  std::cout << "Grid size: " << n_grid_size << '\n';
+  std::cout << "Demo id: " << demo_id << '\n';
 
   switch (demo_id) {
     case 0:
@@ -35,7 +35,7 @@ int main(const int argc, const char* argv[]) {
       demo_simple_cpu_gpu_coarse(n_threads, n_grid_size);
       break;
     default:
-      std::cerr << "Invalid demo id" << std::endl;
+      std::cerr << "Invalid demo id" << '\n';
       break;
   }
 

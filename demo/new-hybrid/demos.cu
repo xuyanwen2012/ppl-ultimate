@@ -41,7 +41,7 @@ void demo_cpu_only(const int n_threads) {
 
   t.start();
 
-  std::cout << "staring CPU only demo" << std::endl;
+  std::cout << "staring CPU only demo" << '\n';
 
   for (auto i = 0; i < n_iterations; ++i) {
     cpu::dispatch_ComputeMorton(n_threads, p.get());
@@ -60,8 +60,8 @@ void demo_cpu_only(const int n_threads) {
 
   // print total time and average time, 't.ms()'
 
-  std::cout << "CPU only Total: " << t.ms() << "ms" << std::endl;
-  std::cout << "Average: " << t.ms() / n_iterations << "ms" << std::endl;
+  std::cout << "CPU only Total: " << t.ms() << "ms" << '\n';
+  std::cout << "Average: " << t.ms() / n_iterations << "ms" << '\n';
 }
 
 // 1: ~187 ms
@@ -80,7 +80,7 @@ void demo_gpu_only(const int grid_size) {
   BS::timer t;
   t.start();
 
-  std::cout << "staring GPU only demo" << std::endl;
+  std::cout << "staring GPU only demo" << '\n';
   for (auto i = 0; i < n_iterations; ++i) {
     constexpr auto stream_id = 0;
     gpu::dispatch_ComputeMorton(grid_size, stream_id, p.get());
@@ -100,8 +100,8 @@ void demo_gpu_only(const int grid_size) {
 
   // print total time and average time, 't.ms()'
 
-  std::cout << "GPU only Total: " << t.ms() << "ms" << std::endl;
-  std::cout << "Average: " << t.ms() / n_iterations << "ms" << std::endl;
+  std::cout << "GPU only Total: " << t.ms() << "ms" << '\n';
+  std::cout << "Average: " << t.ms() / n_iterations << "ms" << '\n';
 
   gpu::release_dispatcher();
 }
@@ -120,7 +120,7 @@ void demo_simple_cpu_gpu_coarse(const int n_threads, const int grid_size) {
   gpu::initialize_dispatcher(n_streams);
 
   gen_data(cpu_p);
-  std::copy(cpu_p->u_points, cpu_p->u_points + n, gpu_p->u_points);
+  std::copy_n(cpu_p->u_points, n, gpu_p->u_points);
 
   // BS::timer t;
   // t.start();
