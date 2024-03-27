@@ -11,17 +11,15 @@
 #endif
 
 template <typename T>
-constexpr void malloc_managed(T** ptr, const size_t num_items)
-{
-	CHECK_CUDA_CALL(
-		cudaMallocManaged(reinterpret_cast<void **>(ptr), num_items * sizeof(T)));
+constexpr void malloc_managed(T** ptr, const size_t num_items) {
+  CHECK_CUDA_CALL(
+      cudaMallocManaged(reinterpret_cast<void**>(ptr), num_items * sizeof(T)));
 }
 
 template <typename T>
-constexpr void malloc_device(T** ptr, const size_t num_items)
-{
-	CHECK_CUDA_CALL(
-		cudaMalloc(reinterpret_cast<void **>(ptr), num_items * sizeof(T)));
+constexpr void malloc_device(T** ptr, const size_t num_items) {
+  CHECK_CUDA_CALL(
+      cudaMalloc(reinterpret_cast<void**>(ptr), num_items * sizeof(T)));
 }
 
 #define MALLOC_MANAGED(ptr, num_items) malloc_managed(ptr, num_items)
