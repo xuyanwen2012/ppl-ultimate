@@ -10,14 +10,13 @@ namespace cpu {
 BS::thread_pool pool;
 
 void dispatch_ComputeMorton(int n_threads, struct pipe* p) {
-  cpu::dispatch_morton_code(pool,
-                            n_threads,
-                            p->n_input(),
-                            p->u_points,
-                            p->u_morton,
-                            p->min_coord,
-                            p->range)
-      .wait();
+  auto ret1 = cpu::dispatch_morton_code(pool,
+                                        n_threads,
+                                        p->n_input(),
+                                        p->u_points,
+                                        p->u_morton,
+                                        p->min_coord,
+                                        p->range);
 }
 
 void dispatch_RadixSort(int n_threads, struct pipe* p) {

@@ -103,7 +103,7 @@ void demo_gpu_only(const int grid_size) {
   std::cout << "GPU only Total: " << t.ms() << "ms" << std::endl;
   std::cout << "Average: " << t.ms() / n_iterations << "ms" << std::endl;
 
-  void release_dispatcher();
+  gpu::release_dispatcher();
 }
 
 void demo_cpu_gpu_independent(int n_threads, int grid_size) {

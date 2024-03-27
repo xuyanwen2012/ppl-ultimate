@@ -25,9 +25,9 @@ void gen_data(const std::unique_ptr<pipe>& p) {
   });
 }
 
-class MyFixture : public benchmark::Fixture {
+class CPU : public benchmark::Fixture {
  public:
-  explicit MyFixture() : p(std::make_unique<pipe>(n, min_coord, range, seed)) {
+  explicit CPU() : p(std::make_unique<pipe>(n, min_coord, range, seed)) {
     gen_data(p);
 
     // basically pregenerate the data
@@ -48,7 +48,7 @@ class MyFixture : public benchmark::Fixture {
 // Morton
 // --------------------------------------------------
 
-BENCHMARK_DEFINE_F(MyFixture, BM_Morton)(benchmark::State& state) {
+BENCHMARK_DEFINE_F(CPU, BM_Morton)(benchmark::State& state) {
   const auto n_threads = state.range(0);
 
   for (auto _ : state) {
@@ -56,7 +56,7 @@ BENCHMARK_DEFINE_F(MyFixture, BM_Morton)(benchmark::State& state) {
   }
 }
 
-BENCHMARK_REGISTER_F(MyFixture, BM_Morton)
+BENCHMARK_REGISTER_F(CPU, BM_Morton)
     ->DenseRange(1, 6, 1)
     ->Unit(benchmark::kMillisecond)
     ->Iterations(n_iterations);
@@ -65,7 +65,7 @@ BENCHMARK_REGISTER_F(MyFixture, BM_Morton)
 // Sort
 // --------------------------------------------------
 
-BENCHMARK_DEFINE_F(MyFixture, BM_Sort)(benchmark::State& state) {
+BENCHMARK_DEFINE_F(CPU, BM_Sort)(benchmark::State& state) {
   const auto n_threads = state.range(0);
 
   for (auto _ : state) {
@@ -73,7 +73,7 @@ BENCHMARK_DEFINE_F(MyFixture, BM_Sort)(benchmark::State& state) {
   }
 }
 
-BENCHMARK_REGISTER_F(MyFixture, BM_Sort)
+BENCHMARK_REGISTER_F(CPU, BM_Sort)
     ->DenseRange(1, 6, 1)
     ->Unit(benchmark::kMillisecond)
     ->Iterations(n_iterations);
@@ -82,7 +82,7 @@ BENCHMARK_REGISTER_F(MyFixture, BM_Sort)
 // Unique
 // --------------------------------------------------
 
-BENCHMARK_DEFINE_F(MyFixture, BM_RemoveDup)(benchmark::State& state) {
+BENCHMARK_DEFINE_F(CPU, BM_RemoveDup)(benchmark::State& state) {
   const auto n_threads = state.range(0);
 
   for (auto _ : state) {
@@ -90,7 +90,7 @@ BENCHMARK_DEFINE_F(MyFixture, BM_RemoveDup)(benchmark::State& state) {
   }
 }
 
-BENCHMARK_REGISTER_F(MyFixture, BM_RemoveDup)
+BENCHMARK_REGISTER_F(CPU, BM_RemoveDup)
     ->DenseRange(1, 6, 1)
     ->Unit(benchmark::kMillisecond)
     ->Iterations(n_iterations);
@@ -99,7 +99,7 @@ BENCHMARK_REGISTER_F(MyFixture, BM_RemoveDup)
 // Radix Tree
 // --------------------------------------------------
 
-BENCHMARK_DEFINE_F(MyFixture, BM_RadixTree)(benchmark::State& state) {
+BENCHMARK_DEFINE_F(CPU, BM_RadixTree)(benchmark::State& state) {
   const auto n_threads = state.range(0);
 
   for (auto _ : state) {
@@ -107,7 +107,7 @@ BENCHMARK_DEFINE_F(MyFixture, BM_RadixTree)(benchmark::State& state) {
   }
 }
 
-BENCHMARK_REGISTER_F(MyFixture, BM_RadixTree)
+BENCHMARK_REGISTER_F(CPU, BM_RadixTree)
     ->DenseRange(1, 6, 1)
     ->Unit(benchmark::kMillisecond)
     ->Iterations(n_iterations);
@@ -116,7 +116,7 @@ BENCHMARK_REGISTER_F(MyFixture, BM_RadixTree)
 // Edge Count
 // --------------------------------------------------
 
-BENCHMARK_DEFINE_F(MyFixture, BM_EdgeCount)(benchmark::State& state) {
+BENCHMARK_DEFINE_F(CPU, BM_EdgeCount)(benchmark::State& state) {
   const auto n_threads = state.range(0);
 
   for (auto _ : state) {
@@ -124,7 +124,7 @@ BENCHMARK_DEFINE_F(MyFixture, BM_EdgeCount)(benchmark::State& state) {
   }
 }
 
-BENCHMARK_REGISTER_F(MyFixture, BM_EdgeCount)
+BENCHMARK_REGISTER_F(CPU, BM_EdgeCount)
     ->DenseRange(1, 6, 1)
     ->Unit(benchmark::kMillisecond)
     ->Iterations(n_iterations);
@@ -133,7 +133,7 @@ BENCHMARK_REGISTER_F(MyFixture, BM_EdgeCount)
 // Edge Offset
 // --------------------------------------------------
 
-BENCHMARK_DEFINE_F(MyFixture, BM_EdgeOffset)(benchmark::State& state) {
+BENCHMARK_DEFINE_F(CPU, BM_EdgeOffset)(benchmark::State& state) {
   const auto n_threads = state.range(0);
 
   for (auto _ : state) {
@@ -141,7 +141,7 @@ BENCHMARK_DEFINE_F(MyFixture, BM_EdgeOffset)(benchmark::State& state) {
   }
 }
 
-BENCHMARK_REGISTER_F(MyFixture, BM_EdgeOffset)
+BENCHMARK_REGISTER_F(CPU, BM_EdgeOffset)
     ->DenseRange(1, 6, 1)
     ->Unit(benchmark::kMillisecond)
     ->Iterations(n_iterations);
@@ -150,7 +150,7 @@ BENCHMARK_REGISTER_F(MyFixture, BM_EdgeOffset)
 // Octree
 // --------------------------------------------------
 
-BENCHMARK_DEFINE_F(MyFixture, BM_Octree)(benchmark::State& state) {
+BENCHMARK_DEFINE_F(CPU, BM_Octree)(benchmark::State& state) {
   const auto n_threads = state.range(0);
 
   for (auto _ : state) {
@@ -158,7 +158,7 @@ BENCHMARK_DEFINE_F(MyFixture, BM_Octree)(benchmark::State& state) {
   }
 }
 
-BENCHMARK_REGISTER_F(MyFixture, BM_Octree)
+BENCHMARK_REGISTER_F(CPU, BM_Octree)
     ->DenseRange(1, 6, 1)
     ->Unit(benchmark::kMillisecond)
     ->Iterations(n_iterations);
