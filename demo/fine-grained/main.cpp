@@ -1,13 +1,21 @@
 
 
 #include <algorithm>
+#include <cstddef>
+#include <glm/fwd.hpp>
 #include <iostream>
 #include <memory>
 #include <random>
 #include <vector>
 
+#include "block.hpp"
+#include "host/barrier.hpp"
+#include "host/brt_func.hpp"
+#include "shared/edge_func.h"
+#include "shared/oct_func.h"
 #include "shared/structures.h"
 #include "third-party/BS_thread_pool.hpp"
+#include "third-party/BS_thread_pool_utils.hpp"
 
 void gen_data(const struct pipe* p) {
   std::mt19937 gen(p->seed);
@@ -19,14 +27,295 @@ void gen_data(const struct pipe* p) {
 
 BS::thread_pool pool;
 
+// ----------------------------------------------------------------------------
+// Morton
+// ----------------------------------------------------------------------------
+
+void k_morton_func(const glm::vec4* u_points_begin,
+                   const glm::vec4* u_points_end,
+                   morton_t* u_morton_out,  // output
+                   const float min_coord,
+                   const float range) {
+  std::transform(u_points_begin,
+                 u_points_end,
+                 u_morton_out,
+                 [min_coord, range](const glm::vec4& xyz) {
+                   return shared::xyz_to_morton32(xyz, min_coord, range);
+                 });
+}
+
+// ----------------------------------------------------------------------------
+// Sort
+// ----------------------------------------------------------------------------
+
+constexpr int BASE_BITS = 8;
+constexpr int BASE = (1 << BASE_BITS);  // 256
+constexpr int MASK = (BASE - 1);        // 0xFF
+
+constexpr int DIGITS(const unsigned int v, const int shift) {
+  return (v >> shift) & MASK;
+}
+
+struct {
+  std::mutex mtx;
+  int bucket[BASE] = {};  // shared among threads
+  std::condition_variable cv;
+  size_t current_thread = 0;
+} sort;
+
+void reset_sort(const size_t n_threads) {
+  std::fill_n(sort.bucket, BASE, 0);
+  sort.current_thread = n_threads - 1;
+}
+
+void k_binning_pass(const size_t tid,
+                    barrier& barrier,
+                    const morton_t* u_sort_begin,
+                    const morton_t* u_sort_end,
+                    morton_t* u_sort_alt,  // output
+                    const int shift) {
+  int local_bucket[BASE] = {};
+
+  // compute histogram (local)
+  std::for_each(u_sort_begin, u_sort_end, [&](const morton_t& code) {
+    ++local_bucket[DIGITS(code, shift)];
+  });
+
+  std::unique_lock lck(sort.mtx);
+
+  // update to shared bucket
+  for (auto i = 0; i < BASE; ++i) {
+    sort.bucket[i] += local_bucket[i];
+  }
+
+  lck.unlock();
+
+  barrier.wait();
+
+  if (tid == 0) {
+    std::partial_sum(std::begin(sort.bucket),
+                     std::end(sort.bucket),
+                     std::begin(sort.bucket));
+  }
+
+  barrier.wait();
+
+  lck.lock();
+  sort.cv.wait(lck, [&] { return tid == sort.current_thread; });
+
+  // update the local_bucket from the shared bucket
+  for (auto i = 0; i < BASE; i++) {
+    sort.bucket[i] -= local_bucket[i];
+    local_bucket[i] = sort.bucket[i];
+  }
+
+  --sort.current_thread;
+  sort.cv.notify_all();
+
+  lck.unlock();
+
+  std::for_each(u_sort_begin, u_sort_end, [&](auto code) {
+    u_sort_alt[local_bucket[DIGITS(code, shift)]++] = code;
+  });
+}
+
+// ----------------------------------------------------------------------------
+// Wrappers (passing )
+// ----------------------------------------------------------------------------
+
+void wrapper() {}
+
+// ----------------------------------------------------------------------------
+// CPU only, maximum threads, do everything
+// ----------------------------------------------------------------------------
+
+// let's say we have 6 threads.
+// should be
+// 0.771 + 2.10 + 0.511 + 4.20 + 0.208 + 0.020 + 4.54 = ~12.359 ms
+void example_pipe(std::unique_ptr<pipe>& p) {
+  const auto desired_n_threads = 6;
+
+  // partition the input data [0, n) into blocks
+  const my_blocks blks(0, p->n_input(), desired_n_threads);
+
+  BS::multi_future<void> future;
+  future.reserve(blks.get_num_blocks());
+  barrier bar(desired_n_threads);
+
+  BS::timer t;
+  t.start();
+
+  for (size_t tid = 0; tid < blks.get_num_blocks(); ++tid) {
+    future.push_back(pool.submit_task(
+        [start = blks.start(tid), end = blks.end(tid), tid, &bar, p = p.get()] {
+          // Kernel A (1/1)
+          k_morton_func(p->u_points + start,
+                        p->u_points + end,
+                        p->u_morton + start,
+                        p->min_coord,
+                        p->range);
+
+          // Kernel B (1/4)
+          bar.wait();
+
+          if (tid == 0) reset_sort(desired_n_threads);
+
+          bar.wait();
+
+          k_binning_pass(static_cast<int>(tid),
+                         bar,
+                         p->u_morton + start,
+                         p->u_morton + end,
+                         p->u_morton_alt,
+                         0);
+          bar.wait();
+
+          // (2/4)
+          bar.wait();
+          if (tid == 0) reset_sort(desired_n_threads);
+          bar.wait();
+
+          k_binning_pass(static_cast<int>(tid),
+                         bar,
+                         p->u_morton_alt + start,
+                         p->u_morton_alt + end,
+                         p->u_morton,
+                         8);
+
+          bar.wait();
+
+          // (3/4)
+          if (tid == 0) reset_sort(desired_n_threads);
+          bar.wait();
+
+          k_binning_pass(static_cast<int>(tid),
+                         bar,
+                         p->u_morton + start,
+                         p->u_morton + end,
+                         p->u_morton_alt,
+                         16);
+
+          // (4/4)
+          bar.wait();
+          if (tid == 0) reset_sort(desired_n_threads);
+          bar.wait();
+
+          k_binning_pass(static_cast<int>(tid),
+                         bar,
+                         p->u_morton_alt + start,
+                         p->u_morton_alt + end,
+                         p->u_morton,
+                         24);
+          bar.wait();
+
+          // Kernel C (1/1)
+          if (tid == 0) {
+            // remove duplicates (single thread)
+            const auto last = std::unique_copy(
+                p->u_morton, p->u_morton + p->n_input(), p->u_morton_alt);
+            const auto n_unique = std::distance(p->u_morton_alt, last);
+
+            p->set_n_unique(static_cast<int>(n_unique));
+            p->brt.set_n_nodes(n_unique - 1);
+          }
+          bar.wait();
+
+          // Kernel D (1/1) Radix Tree
+          for (auto i = start; i < end; ++i) {
+            // boundary check
+            if (i < p->n_brt_nodes()) {
+              cpu::process_radix_tree_i(
+                  i, p->n_brt_nodes(), p->u_morton_alt, &p->brt);
+            }
+          }
+
+          bar.wait();
+
+          // Kernel E and F (1/2)
+          for (auto i = start; i < end; ++i) {
+            if (i < p->n_brt_nodes()) {
+              shared::process_edge_count_i(
+                  i, p->brt.u_prefix_n, p->brt.u_parents, p->u_edge_counts);
+            }
+          }
+
+          bar.wait();
+          // (2/2)
+          if (tid == 0) {
+            std::partial_sum(p->u_edge_counts,
+                             p->u_edge_counts + p->n_brt_nodes(),
+                             p->u_edge_offsets);
+            const auto n_oct_nodes = p->u_edge_offsets[p->n_brt_nodes() - 1];
+            p->oct.set_n_nodes(n_oct_nodes);
+          }
+          bar.wait();
+
+          // Kernel G (1/2) Octree
+          for (auto i = start; i < end; ++i) {
+            if (i < p->n_brt_nodes()) {
+              shared::process_oct_node(i,
+                                       p->oct.u_children,
+                                       p->oct.u_corner,
+                                       p->oct.u_cell_size,
+                                       p->oct.u_child_node_mask,
+                                       p->u_edge_offsets,
+                                       p->u_edge_counts,
+                                       p->u_morton_alt,  // sorted unique morton
+                                       p->brt.u_prefix_n,
+                                       p->brt.u_parents,
+                                       p->min_coord,
+                                       p->range);
+            }
+          }
+
+          // (2/2)
+          bar.wait();
+          for (auto i = start; i < end; ++i) {
+            if (i < p->n_brt_nodes()) {
+              shared::process_link_leaf(
+                  i,
+                  p->oct.u_children,
+                  p->oct.u_child_leaf_mask,
+                  p->u_edge_offsets,
+                  p->u_edge_counts,
+                  p->u_morton_alt,  // sorted unique morton
+                  p->brt.u_has_leaf_left,
+                  p->brt.u_has_leaf_right,
+                  p->brt.u_prefix_n,
+                  p->brt.u_parents,
+                  p->brt.u_left_child);
+            }
+          }
+        }));
+  }
+
+  future.wait();
+
+  t.stop();
+
+  std::cout << "Time: " << t.ms() << "ms\n";
+
+  auto is_sorted = std::is_sorted(p->u_morton, p->u_morton + p->n_input());
+  std::cout << "is_sorted: " << std::boolalpha << is_sorted << '\n';
+
+  std::cout << "n_unique: " << p->n_unique_mortons() << '\n';
+  std::cout << "n_nodes: " << p->brt.n_nodes() << '\n';
+}
+
 int main() {
   constexpr auto n = 640 * 480;  // ~300k
 
-  std::vector<std::unique_ptr<pipe>> pipes;
-  for (auto i = 0; i < 10; ++i) {
-    pipes.push_back(std::make_unique<pipe>(n));
-    gen_data(pipes.back().get());
-  }
+  // std::vector<std::unique_ptr<pipe>> pipes;
+  // for (auto i = 0; i < 4; ++i) {
+  //   pipes.push_back(std::make_unique<pipe>(n));
+  //   gen_data(pipes.back().get());
+  // }
+
+  std::unique_ptr<pipe> p = std::make_unique<pipe>(n);
+
+  gen_data(p.get());
+
+  example_pipe(p);
 
   std::cout << "done\n";
   return 0;
