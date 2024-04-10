@@ -33,9 +33,10 @@ class CPU : public benchmark::Fixture {
 
     // basically pregenerate the data
     const auto max_thread = std::thread::hardware_concurrency();
+    // print max thread
     cpu::dispatch_ComputeMorton(max_thread, p.get());
     cpu::dispatch_RadixSort(max_thread, p.get());
-    cpu::dispatch_RemoveDuplicates(max_thread, p.get());
+    cpu::dispatch_RemoveDuplicates(max_thread, p.get());  // Segmentation fault
     cpu::dispatch_BuildRadixTree(max_thread, p.get());
     cpu::dispatch_EdgeCount(max_thread, p.get());
     cpu::dispatch_EdgeOffset(max_thread, p.get());
@@ -164,4 +165,9 @@ BENCHMARK_REGISTER_F(CPU, BM_Octree)
     ->Unit(benchmark::kMillisecond)
     ->Iterations(n_iterations);
 
-BENCHMARK_MAIN();
+// BENCHMARK_MAIN();
+
+int main(int argc, char** argv) {
+  benchmark::Initialize(&argc, argv);
+  // benchmark::RunSpecifiedBenchmarks(nullptr, nullptr, {});
+}

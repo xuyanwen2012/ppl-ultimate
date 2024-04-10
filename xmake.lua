@@ -1,6 +1,7 @@
 add_rules("mode.debug", "mode.release")
 
 
+
 set_languages("cxx17")
 set_warnings("all")
 
@@ -11,6 +12,6 @@ if is_plat("linux") then
 end
 
 includes("ppl")
-includes("tests")
-includes("demo")
+--includes("tests")
+--includes("demo")
 includes("benchmarks")
