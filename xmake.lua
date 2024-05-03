@@ -1,7 +1,6 @@
 add_rules("mode.debug", "mode.release")
 
-
-
+set_defaultmode("debug")
 set_languages("cxx17")
 set_warnings("all")
 
