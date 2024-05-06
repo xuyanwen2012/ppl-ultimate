@@ -18,7 +18,7 @@ namespace cpu {
   return pool.submit_blocks(
       0,
       radix_tree->n_nodes(),
-      [&](const int start, const int end) {
+      [=](const int start, const int end) {
         for (auto i = start; i < end; ++i) {
           shared::process_edge_count_i(
               i, radix_tree->u_prefix_n, radix_tree->u_parents, edge_count);
