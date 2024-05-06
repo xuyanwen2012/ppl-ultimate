@@ -16,7 +16,7 @@ constexpr auto range = 1024.0f;
 constexpr auto seed = 114514;
 
 // Max threads
-constexpr auto max_threads = std::thread::hardware_concurrency();
+auto max_threads = std::thread::hardware_concurrency();
 
 // Bench mark config
 constexpr auto n_iterations = 5;
