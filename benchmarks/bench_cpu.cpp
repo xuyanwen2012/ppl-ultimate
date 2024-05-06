@@ -10,13 +10,13 @@
 
 // Problem size
 constexpr auto n = 640 * 480;  // ~300k
-//constexpr auto n = 1920 * 1080;  // ~2M
+// constexpr auto n = 1920 * 1080;  // ~2M
 constexpr auto min_coord = 0.0f;
 constexpr auto range = 1024.0f;
 constexpr auto seed = 114514;
 
 // Max threads
-constexpr auto max_threads = 8;
+constexpr auto max_threads = hardware_concurrency();
 
 // Bench mark config
 constexpr auto n_iterations = 5;
