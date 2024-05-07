@@ -19,7 +19,7 @@ namespace cpu {
     int* edge_offset) {
   // should not use ".end()", we allocated more than actual data
   // we need to use our own "n_brt_nodes"
-  return pool.submit_task([=, &edge_count, &edge_offset]() {
+  return pool.submit_task([=, &edge_offset]() {
     std::partial_sum(edge_count, edge_count + n_brt_nodes, edge_offset);
     return edge_offset[n_brt_nodes - 1];
   });
