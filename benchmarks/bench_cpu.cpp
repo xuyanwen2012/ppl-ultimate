@@ -17,10 +17,7 @@ constexpr auto min_coord = 0.0f;
 constexpr auto range = 1024.0f;
 constexpr auto seed = 114514;
 
-// Max threads
 unsigned max_threads;
-
-// Bench mark config
 constexpr auto n_iterations = 50;
 
 void gen_data(const std::unique_ptr<pipe>& p) {
@@ -186,15 +183,16 @@ void register_benchmarks() {
 
 int main(int argc, char** argv) {
   CLI::App app{"CPU Benchmark"};
+  app.allow_extras();
 
   // Determine the maximum number of threads supported by the hardware
   max_threads = std::thread::hardware_concurrency();
   std::vector<int> cores = {};
 
-  // Add options for custom core setting
+  // Add option for thread pinning to specific cores
   app.add_option(
          "--cores", cores, "Set specific cores to run the benchmarks on")
-      ->expected(-1);  // Allows an unlimited number of arguments
+      ->expected(1, max_threads);
 
   CLI11_PARSE(app, argc, argv);
 
@@ -209,13 +207,7 @@ int main(int argc, char** argv) {
   // Initialize Google Benchmark
   benchmark::Initialize(&argc, argv);
 
-  // Optionally, check if Google Benchmark should run
-  if (benchmark::ReportUnrecognizedArguments(argc, argv)) {
-    return 1;  // Help or error message already displayed
-  }
-
   // Register and run benchmarks
-  std::cout << "Running benchmarks..." << std::endl;
   benchmark::RunSpecifiedBenchmarks();
   return 0;
 }

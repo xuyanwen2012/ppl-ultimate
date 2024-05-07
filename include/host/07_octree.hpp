@@ -20,62 +20,16 @@ namespace cpu {
     const octree& octree,  // output
     const float min_coord,
     const float range) {
-  std::cerr << "\nBEFORE edge_count: ";
-  for (int i = 0; i < 50; i++) {
-    std::cerr << edge_count[i] << " ";
-  }
-  std::cerr << "\nBEFORE edge_offset: ";
-  for (int i = 0; i < 20; i++) {
-    std::cerr << edge_offset[i] << " ";
-  }
-  std::cerr << "\nBEFORE sorted_uniqe_morton: ";
-  for (int i = 0; i < 20; i++) {
-    std::cerr << sorted_unique_morton[i] << " ";
-  }
-  std::cerr << "\nBEFORE radix_tree.u_prefix_n: ";
-  for (int i = 0; i < 20; i++) {
-    std::cerr << static_cast<int>(radix_tree.u_prefix_n[i]) << " ";
-  }
-  std::cerr << "\nBEFORE radix_tree.u_parents: ";
-  for (int i = 0; i < 20; i++) {
-    std::cerr << radix_tree.u_parents[i] << " ";
-  }
-  std::cerr << "\nBEFORE min_coord: " << min_coord;
-  std::cerr << "\nBEFORE range: " << range;
-
   return pool.submit_blocks(
       1,  // making sure for cpu, skip the root node
       radix_tree.n_nodes(),
       [=,
-       &n_desired_threads,
        &edge_count,
        &sorted_unique_morton,
        &radix_tree,
        &octree,
        &min_coord,
        &range](const int start, const int end) {
-        std::cerr << "\nedge_count: ";
-        for (int i = 0; i < 50; i++) {
-          std::cerr << edge_count[i] << " ";
-        }
-        std::cerr << "\nedge_offset: ";
-        for (int i = 0; i < 20; i++) {
-          std::cerr << edge_offset[i] << " ";
-        }
-        std::cerr << "\nsorted_uniqe_morton: ";
-        for (int i = 0; i < 20; i++) {
-          std::cerr << sorted_unique_morton[i] << " ";
-        }
-        std::cerr << "\nradix_tree.u_prefix_n: ";
-        for (int i = 0; i < 20; i++) {
-          std::cerr << static_cast<int>(radix_tree.u_prefix_n[i]) << " ";
-        }
-        std::cerr << "\nradix_tree.u_parents: ";
-        for (int i = 0; i < 20; i++) {
-          std::cerr << radix_tree.u_parents[i] << " ";
-        }
-        std::cerr << "\nmin_coord: " << min_coord;
-        std::cerr << "\nrange: " << range;
         for (auto i = start; i < end; ++i) {
           shared::process_oct_node(i,
                                    octree.u_children,
@@ -103,11 +57,11 @@ namespace cpu {
     const radix_tree& radix_tree,
     const octree& octree  // output
 ) {
-  std::cerr << "\n\nSTARTING edge_count: ";
   return pool.submit_blocks(
       0,
       radix_tree.n_nodes(),
-      [&](const int start, const int end) {
+      [=, &edge_count, &sorted_unique_morton, &radix_tree, &octree](
+          const int start, const int end) {
         for (auto i = start; i < end; ++i) {
           shared::process_link_leaf(i,
                                     octree.u_children,

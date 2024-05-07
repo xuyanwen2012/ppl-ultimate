@@ -18,11 +18,11 @@ void pin_thread() {
   if (sched_setaffinity(0, sizeof(cpu_set_t), &cpuset) != 0) {
     perror("sched_setaffinity failed");
   } else {
-    printf("Thread %u set to CPU %d\n", std::this_thread::get_id(), core);
+    printf("Thread %u pinned to Core %d\n", std::this_thread::get_id(), core);
   }
 }
 
-BS::thread_pool pool;
+BS::thread_pool pool; // By default, use all cores, but can be changed by start_thread_pool
 
 void start_thread_pool(int n_threads, std::vector<int> cores) {
   if (cores.size() > 0) {
