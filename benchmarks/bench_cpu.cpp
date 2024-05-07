@@ -8,16 +8,17 @@
 
 #include "host/dispatcher.hpp"
 #include "host_code.hpp"
+#include "third-party/CLI11.hpp"
 
 // Problem size
-// constexpr auto n = 640 * 480;  // ~300k
-constexpr auto n = 1920 * 1080;  // ~2M
+constexpr auto n = 640 * 480;  // ~300k
+// constexpr auto n = 1920 * 1080;  // ~2M
 constexpr auto min_coord = 0.0f;
 constexpr auto range = 1024.0f;
 constexpr auto seed = 114514;
 
 // Max threads
-int max_threads;
+unsigned max_threads;
 
 // Bench mark config
 constexpr auto n_iterations = 50;
@@ -184,26 +185,37 @@ void register_benchmarks() {
 }
 
 int main(int argc, char** argv) {
+  CLI::App app{"CPU Benchmark"};
+
+  // Determine the maximum number of threads supported by the hardware
   max_threads = std::thread::hardware_concurrency();
   std::vector<int> cores = {};
 
-  if (argc >= 2) {
-    int n = std::min(max_threads, argc);
-    for (int i = 1; i < n; ++i) {
-      cores.push_back(std::atoi(argv[i]));
-    }
+  // Add options for custom core setting
+  app.add_option(
+         "--cores", cores, "Set specific cores to run the benchmarks on")
+      ->expected(-1);  // Allows an unlimited number of arguments
+
+  CLI11_PARSE(app, argc, argv);
+
+  // Adjust max_threads based on the number of specified cores
+  if (!cores.empty()) {
     max_threads = cores.size();
   }
 
-  // print cores vector
-  for (const auto& core : cores) {
-    std::cout << core << " " << std::endl;
+  cpu::start_thread_pool(max_threads, cores);
+  register_benchmarks();
+
+  // Initialize Google Benchmark
+  benchmark::Initialize(&argc, argv);
+
+  // Optionally, check if Google Benchmark should run
+  if (benchmark::ReportUnrecognizedArguments(argc, argv)) {
+    return 1;  // Help or error message already displayed
   }
 
-  cpu::start_thread_pool(max_threads, cores);
-
-  register_benchmarks();
-  benchmark::Initialize(&argc, argv);
+  // Register and run benchmarks
+  std::cout << "Running benchmarks..." << std::endl;
   benchmark::RunSpecifiedBenchmarks();
   return 0;
 }
