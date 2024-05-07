@@ -1,4 +1,5 @@
 # Pipeline
+#### Google Pixel 6 - All Cores
 ```
 ------------------------------------------------------------------------------------
 Benchmark                                          Time             CPU   Iterations
@@ -38,4 +39,27 @@ CPU/BM_Octree/Threads:2/iterations:50           94.4 ms        0.656 ms         
 CPU/BM_Octree/Threads:4/iterations:50           78.7 ms        0.869 ms           50
 CPU/BM_Octree/Threads:8/iterations:50           69.8 ms         1.01 ms           50
 ```
-Google Pixel 6
+#### Google Pixel 6 - Small Core
+
+
+#### Google Pixel 6 - Medium Core
+
+
+
+#### Google Pixel 6 - Big Core
+
+
+#### Google Pixel 6 - 4 Small Cores
+
+
+#### Google Pixel 6 - 2 Medium Cores
+
+
+#### Google Pixel 6 - 2 Big Cores
+
+
+
+
+
+
+
