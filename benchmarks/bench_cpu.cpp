@@ -7,19 +7,20 @@
 #include <thread>
 
 #include "host/dispatcher.hpp"
+#include "host_code.hpp"
 
 // Problem size
-constexpr auto n = 640 * 480;  // ~300k
-// constexpr auto n = 1920 * 1080;  // ~2M
+// constexpr auto n = 640 * 480;  // ~300k
+constexpr auto n = 1920 * 1080;  // ~2M
 constexpr auto min_coord = 0.0f;
 constexpr auto range = 1024.0f;
 constexpr auto seed = 114514;
 
 // Max threads
-auto max_threads = std::thread::hardware_concurrency();
+int max_threads;
 
 // Bench mark config
-constexpr auto n_iterations = 5;
+constexpr auto n_iterations = 50;
 
 void gen_data(const std::unique_ptr<pipe>& p) {
   std::mt19937 gen(seed);  // NOLINT(cert-msc51-cpp)
@@ -35,14 +36,13 @@ class CPU : public benchmark::Fixture {
     gen_data(p);
 
     // basically pregenerate the data
-    const auto max_thread = std::thread::hardware_concurrency();
-    cpu::dispatch_ComputeMorton(max_thread, p.get());
-    cpu::dispatch_RadixSort(max_thread, p.get());
-    cpu::dispatch_RemoveDuplicates(max_thread, p.get());
-    cpu::dispatch_BuildRadixTree(1, p.get());
-    cpu::dispatch_EdgeCount(max_thread, p.get());
-    cpu::dispatch_EdgeOffset(max_thread, p.get());
-    // cpu::dispatch_BuildOctree(max_thread, p.get());
+    cpu::dispatch_ComputeMorton(max_threads, p.get());
+    cpu::dispatch_RadixSort(max_threads, p.get());
+    cpu::dispatch_RemoveDuplicates(max_threads, p.get());
+    cpu::dispatch_BuildRadixTree(max_threads, p.get());
+    cpu::dispatch_EdgeCount(max_threads, p.get());
+    cpu::dispatch_EdgeOffset(max_threads, p.get());
+    cpu::dispatch_BuildOctree(max_threads, p.get());
   }
 
   std::unique_ptr<pipe> p;
@@ -60,13 +60,6 @@ BENCHMARK_DEFINE_F(CPU, BM_Morton)(benchmark::State& state) {
   }
 }
 
-BENCHMARK_REGISTER_F(CPU, BM_Morton)
-    ->RangeMultiplier(2)
-    ->Range(1, max_threads)
-    ->ArgName("Threads")
-    ->Unit(benchmark::kMillisecond)
-    ->Iterations(n_iterations);
-
 // --------------------------------------------------
 // Sort
 // --------------------------------------------------
@@ -78,13 +71,6 @@ BENCHMARK_DEFINE_F(CPU, BM_Sort)(benchmark::State& state) {
     cpu::dispatch_RadixSort(n_threads, p.get());
   }
 }
-
-BENCHMARK_REGISTER_F(CPU, BM_Sort)
-    ->RangeMultiplier(2)
-    ->Range(1, max_threads)
-    ->ArgName("Threads")
-    ->Unit(benchmark::kMillisecond)
-    ->Iterations(n_iterations);
 
 // --------------------------------------------------
 // Unique
@@ -98,13 +84,6 @@ BENCHMARK_DEFINE_F(CPU, BM_RemoveDup)(benchmark::State& state) {
   }
 }
 
-BENCHMARK_REGISTER_F(CPU, BM_RemoveDup)
-    ->RangeMultiplier(2)
-    ->Range(1, max_threads)
-    ->ArgName("Threads")
-    ->Unit(benchmark::kMillisecond)
-    ->Iterations(n_iterations);
-
 // --------------------------------------------------
 // Radix Tree
 // --------------------------------------------------
@@ -117,12 +96,6 @@ BENCHMARK_DEFINE_F(CPU, BM_RadixTree)(benchmark::State& state) {
   }
 }
 
-BENCHMARK_REGISTER_F(CPU, BM_RadixTree)
-    ->RangeMultiplier(2)
-    ->Range(1, max_threads)
-    ->ArgName("Threads")
-    ->Unit(benchmark::kMillisecond)
-    ->Iterations(n_iterations);
 // --------------------------------------------------
 // Edge Count
 // --------------------------------------------------
@@ -134,13 +107,6 @@ BENCHMARK_DEFINE_F(CPU, BM_EdgeCount)(benchmark::State& state) {
     cpu::dispatch_EdgeCount(n_threads, p.get());
   }
 }
-
-BENCHMARK_REGISTER_F(CPU, BM_EdgeCount)
-    ->RangeMultiplier(2)
-    ->Range(1, max_threads)
-    ->ArgName("Threads")
-    ->Unit(benchmark::kMillisecond)
-    ->Iterations(n_iterations);
 
 // --------------------------------------------------
 // Edge Offset
@@ -154,13 +120,6 @@ BENCHMARK_DEFINE_F(CPU, BM_EdgeOffset)(benchmark::State& state) {
   }
 }
 
-BENCHMARK_REGISTER_F(CPU, BM_EdgeOffset)
-    ->RangeMultiplier(2)
-    ->Range(1, max_threads)
-    ->ArgName("Threads")
-    ->Unit(benchmark::kMillisecond)
-    ->Iterations(n_iterations);
-
 // --------------------------------------------------
 // Octree
 // --------------------------------------------------
@@ -173,12 +132,78 @@ BENCHMARK_DEFINE_F(CPU, BM_Octree)(benchmark::State& state) {
   }
 }
 
-BENCHMARK_REGISTER_F(CPU, BM_Octree)
+void register_benchmarks() {
+  BENCHMARK_REGISTER_F(CPU, BM_Morton)
+      ->RangeMultiplier(2)
+      ->Range(1, max_threads)
+      ->ArgName("Threads")
+      ->Unit(benchmark::kMillisecond)
+      ->Iterations(n_iterations);
 
-    ->RangeMultiplier(2)
-    ->Range(1, max_threads)
-    ->ArgName("Threads")
-    ->Unit(benchmark::kMillisecond)
-    ->Iterations(n_iterations);
+  BENCHMARK_REGISTER_F(CPU, BM_Sort)
+      ->RangeMultiplier(2)
+      ->Range(1, max_threads)
+      ->ArgName("Threads")
+      ->Unit(benchmark::kMillisecond)
+      ->Iterations(n_iterations);
 
-BENCHMARK_MAIN();
+  BENCHMARK_REGISTER_F(CPU, BM_RemoveDup)
+      ->RangeMultiplier(2)
+      ->Range(1, max_threads)
+      ->ArgName("Threads")
+      ->Unit(benchmark::kMillisecond)
+      ->Iterations(n_iterations);
+
+  BENCHMARK_REGISTER_F(CPU, BM_RadixTree)
+      ->RangeMultiplier(2)
+      ->Range(1, max_threads)
+      ->ArgName("Threads")
+      ->Unit(benchmark::kMillisecond)
+      ->Iterations(n_iterations);
+
+  BENCHMARK_REGISTER_F(CPU, BM_EdgeCount)
+      ->RangeMultiplier(2)
+      ->Range(1, max_threads)
+      ->ArgName("Threads")
+      ->Unit(benchmark::kMillisecond)
+      ->Iterations(n_iterations);
+
+  BENCHMARK_REGISTER_F(CPU, BM_EdgeOffset)
+      ->RangeMultiplier(2)
+      ->Range(1, max_threads)
+      ->ArgName("Threads")
+      ->Unit(benchmark::kMillisecond)
+      ->Iterations(n_iterations);
+
+  BENCHMARK_REGISTER_F(CPU, BM_Octree)
+      ->RangeMultiplier(2)
+      ->Range(1, max_threads)
+      ->ArgName("Threads")
+      ->Unit(benchmark::kMillisecond)
+      ->Iterations(n_iterations);
+}
+
+int main(int argc, char** argv) {
+  max_threads = std::thread::hardware_concurrency();
+  std::vector<int> cores = {};
+
+  if (argc >= 2) {
+    int n = std::min(max_threads, argc);
+    for (int i = 1; i < n; ++i) {
+      cores.push_back(std::atoi(argv[i]));
+    }
+    max_threads = cores.size();
+  }
+
+  // print cores vector
+  for (const auto& core : cores) {
+    std::cout << core << " " << std::endl;
+  }
+
+  cpu::start_thread_pool(max_threads, cores);
+
+  register_benchmarks();
+  benchmark::Initialize(&argc, argv);
+  benchmark::RunSpecifiedBenchmarks();
+  return 0;
+}
