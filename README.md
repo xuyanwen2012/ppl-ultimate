@@ -1,4 +1,30 @@
-# Pipeline
+## Project Build Instructions
+
+### Step 1: Clone the Project
+First, clone the `android` branch of the `ppl-ultimate` repository from GitHub:
+```bash
+git clone -b android https://github.com/xuyanwen2012/ppl-ultimate.git
+```
+### Configure
+```bash
+cd ppl-ultimate
+xmake f -p android --ndk_sdkver=24
+```
+### Build
+```bash
+xmake
+```
+### Run on Device
+To run the project on your Android device, you can execute the script with an optional `--cores` parameter to specify thread pinning to particular CPU cores:
+```bash
+./run_adb.sh --cores 0 1 2 3 4 ...
+```
+
+
+
+
+
+# Results
 #### Google Pixel 6 - All Cores
 ```
 ------------------------------------------------------------------------------------
