@@ -24,7 +24,7 @@ To run the project on your Android device, you can execute the script with an op
 
 
 
-# Results
+## Results
 #### Google Pixel 6 - All Cores
 ```
 ------------------------------------------------------------------------------------
