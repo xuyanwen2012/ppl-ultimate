@@ -20,8 +20,11 @@ To run the project on your Android device, you can execute the script with an op
 ./run_adb.sh --cores 0 1 2 3 4 ...
 ```
 
+You can also use the Google Benchmark command line arguments found [here](https://github.com/google/benchmark/blob/main/docs/user_guide.md)
 
-
+```bash
+./run_adb.sh --cores 0 1 2 3 --benchmark_format=<console|json|csv> --benchmark_out=<filename> --benchmark_out_format={json|console|csv} ...
+```
 
 
 ## Results
