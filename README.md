@@ -1,6 +1,6 @@
 ## Pipeline Build Instructions
 
-### Step 1: Clone the Project
+### Clone the Project
 First, clone the `android` branch of the `ppl-ultimate` repository from GitHub:
 ```bash
 git clone -b android https://github.com/xuyanwen2012/ppl-ultimate.git
@@ -14,18 +14,21 @@ xmake f -p android --ndk_sdkver=24
 ```bash
 xmake
 ```
-### Run on Device
-To run the project on your Android device, you can execute the script with an optional `--cores` parameter to specify thread pinning to particular CPU cores:
+## Running on Device
+
+To run the pipeline on your benchmark device. You can either manually push the binary to the Android device and run it in an adb shell. Or you can use the `run_adb.sh` script provided in this repository.
+
+To run the project on your Android device, you can execute `run_adb.sh` with an optional `--cores` parameter to specify thread pinning to particular CPU cores:
 ```bash
 ./run_adb.sh --cores 0 1 2 3 4 ...
 ```
 
-You can also use the Google Benchmark command line arguments found [here](https://github.com/google/benchmark/blob/main/docs/user_guide.md)
+You can also use the Google Benchmark CLI arguments when running the script. For example:
 
 ```bash
 ./run_adb.sh --cores 0 1 2 3 --benchmark_format=<console|json|csv> --benchmark_out=<filename> --benchmark_out_format={json|console|csv} ...
 ```
-
+For more details on Google Benchmark CLI arguments, check the [official documentation](https://github.com/google/benchmark/blob/main/docs/user_guide.md).
 
 ## Results
 #### Google Pixel 6 - All Cores
