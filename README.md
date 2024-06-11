@@ -16,7 +16,7 @@ xmake
 ```
 ## Running on Device
 
-To run the pipeline on your benchmark device. You can either manually push the binary to the Android device and run it in an adb shell. Or you can use the `run_adb.sh` script provided in this repository.
+To run the pipeline on your benchmark device. You can either manually push the binary to the Android device and run it in an adb shell. Or you can use the `run_adb.sh` script on your computer which will do these steps for you.
 
 To run the project on your Android device, you can execute `run_adb.sh` with an optional `--cores` parameter to specify thread pinning to particular CPU cores:
 ```bash
@@ -28,7 +28,7 @@ You can also use the Google Benchmark CLI arguments when running the script. For
 ```bash
 ./run_adb.sh --cores 0 1 2 3 --benchmark_format=<console|json|csv> --benchmark_out=<filename> --benchmark_out_format={json|console|csv} ...
 ```
-For more details on Google Benchmark CLI arguments, check the [official documentation](https://github.com/google/benchmark/blob/main/docs/user_guide.md).
+Note that if you were to specify an output file, it would be created on the android device, not the computer. For more details on Google Benchmark CLI arguments, check the [official documentation](https://github.com/google/benchmark/blob/main/docs/user_guide.md).
 
 ## Results
 #### Google Pixel 6 - All Cores
