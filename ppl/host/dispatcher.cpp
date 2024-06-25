@@ -2,14 +2,16 @@
 
 #include "host/all.hpp"
 #include "host/barrier.hpp"
+#include "host/manager.hpp"
 #include "third-party/BS_thread_pool.hpp"
 
 namespace cpu {
 // by default it uses maximum number of threads on the System, great!
 
-extern BS::thread_pool pool;
+extern ThreadPoolManager manager;
 
-void dispatch_ComputeMorton(const int n_threads, pipe* p) {
+void dispatch_ComputeMorton(const int n_threads, pipe* p, const int pool_id) {
+  BS::thread_pool& pool = manager.get_thread_pool(pool_id);
   cpu::dispatch_morton_code(pool,
                             n_threads,
                             p->n_input(),
@@ -20,7 +22,8 @@ void dispatch_ComputeMorton(const int n_threads, pipe* p) {
       .wait();
 }
 
-void dispatch_RadixSort(const int n_threads, pipe* p) {
+void dispatch_RadixSort(const int n_threads, pipe* p, const int pool_id) {
+  BS::thread_pool& pool = manager.get_thread_pool(pool_id);
   barrier bar(n_threads);
   dispatch_binning_pass(
       pool, n_threads, bar, p->n_input(), p->u_morton, p->u_morton_alt, 0)
@@ -36,7 +39,10 @@ void dispatch_RadixSort(const int n_threads, pipe* p) {
       .wait();
 }
 
-void dispatch_RemoveDuplicates(const int n_threads, pipe* p) {
+void dispatch_RemoveDuplicates(const int n_threads,
+                               pipe* p,
+                               const int pool_id) {
+  BS::thread_pool& pool = manager.get_thread_pool(pool_id);
   auto unique_future =
       dispatch_unique(pool, p->n_input(), p->u_morton, p->u_morton_alt);
   auto n_unique = unique_future.get();
@@ -44,20 +50,24 @@ void dispatch_RemoveDuplicates(const int n_threads, pipe* p) {
   p->brt.set_n_nodes(n_unique - 1);
 }
 
-void dispatch_BuildRadixTree(const int n_threads, pipe* p) {
+void dispatch_BuildRadixTree(const int n_threads, pipe* p, const int pool_id) {
+  BS::thread_pool& pool = manager.get_thread_pool(pool_id);
   dispatch_build_radix_tree(pool, n_threads, p->u_morton_alt, &p->brt).wait();
 }
 
-void dispatch_EdgeCount(const int n_threads, pipe* p) {
+void dispatch_EdgeCount(const int n_threads, pipe* p, const int pool_id) {
+  BS::thread_pool& pool = manager.get_thread_pool(pool_id);
   dispatch_edge_count(pool, n_threads, &p->brt, p->u_edge_counts).wait();
 }
 
-void dispatch_EdgeOffset(const int n_threads, pipe* p) {
+void dispatch_EdgeOffset(const int n_threads, pipe* p, const int pool_id) {
+  BS::thread_pool& pool = manager.get_thread_pool(pool_id);
   dispatch_edge_offset(pool, n_threads, p->u_edge_counts, p->u_edge_offsets)
       .wait();
 }
 
-void dispatch_BuildOctree(const int n_threads, pipe* p) {
+void dispatch_BuildOctree(const int n_threads, pipe* p, const int pool_id) {
+  BS::thread_pool& pool = manager.get_thread_pool(pool_id);
   dispatch_make_oct_node(pool,
                          n_threads,
                          p->u_edge_offsets,

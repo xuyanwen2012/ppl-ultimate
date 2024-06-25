@@ -1,9 +1,7 @@
 #pragma once
 
-#include <vector>
-
 namespace cpu {
 
-void start_thread_pool(int n_threads, std::vector<int> cores);
+void start_thread_manager(const std::vector<std::vector<int>>& core_ids_2d_vec);
 
 }

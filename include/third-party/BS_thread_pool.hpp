@@ -385,7 +385,6 @@ class [[nodiscard]] thread_pool {
     wait();
     destroy_threads();
   }
-
   // =======================
   // Public member functions
   // =======================

@@ -4,12 +4,12 @@
 #include <iostream>
 #include <memory>
 #include <random>
+#include <regex>
 #include <thread>
 
 #include "host/dispatcher.hpp"
 #include "host_code.hpp"
 #include "third-party/CLI11.hpp"
-
 // Problem size
 constexpr auto n = 640 * 480;  // ~300k
 // constexpr auto n = 1920 * 1080;  // ~2M
@@ -34,13 +34,13 @@ class CPU : public benchmark::Fixture {
     gen_data(p);
 
     // basically pregenerate the data
-    cpu::dispatch_ComputeMorton(max_threads, p.get());
-    cpu::dispatch_RadixSort(max_threads, p.get());
-    cpu::dispatch_RemoveDuplicates(max_threads, p.get());
-    cpu::dispatch_BuildRadixTree(max_threads, p.get());
-    cpu::dispatch_EdgeCount(max_threads, p.get());
-    cpu::dispatch_EdgeOffset(max_threads, p.get());
-    cpu::dispatch_BuildOctree(max_threads, p.get());
+    cpu::dispatch_ComputeMorton(max_threads, p.get(), 0);
+    cpu::dispatch_RadixSort(max_threads, p.get(), 0);
+    cpu::dispatch_RemoveDuplicates(max_threads, p.get(), 0);
+    cpu::dispatch_BuildRadixTree(max_threads, p.get(), 0);
+    cpu::dispatch_EdgeCount(max_threads, p.get(), 0);
+    cpu::dispatch_EdgeOffset(max_threads, p.get(), 0);
+    cpu::dispatch_BuildOctree(max_threads, p.get(), 0);
   }
 
   std::unique_ptr<pipe> p;
@@ -54,7 +54,7 @@ BENCHMARK_DEFINE_F(CPU, BM_Morton)(benchmark::State& state) {
   const auto n_threads = state.range(0);
 
   for (auto _ : state) {
-    cpu::dispatch_ComputeMorton(n_threads, p.get());
+    cpu::dispatch_ComputeMorton(n_threads, p.get(), 0);
   }
 }
 
@@ -66,7 +66,7 @@ BENCHMARK_DEFINE_F(CPU, BM_Sort)(benchmark::State& state) {
   const auto n_threads = state.range(0);
 
   for (auto _ : state) {
-    cpu::dispatch_RadixSort(n_threads, p.get());
+    cpu::dispatch_RadixSort(n_threads, p.get(), 0);
   }
 }
 
@@ -78,7 +78,7 @@ BENCHMARK_DEFINE_F(CPU, BM_RemoveDup)(benchmark::State& state) {
   const auto n_threads = state.range(0);
 
   for (auto _ : state) {
-    cpu::dispatch_RemoveDuplicates(n_threads, p.get());
+    cpu::dispatch_RemoveDuplicates(n_threads, p.get(), 0);
   }
 }
 
@@ -90,7 +90,7 @@ BENCHMARK_DEFINE_F(CPU, BM_RadixTree)(benchmark::State& state) {
   const auto n_threads = state.range(0);
 
   for (auto _ : state) {
-    cpu::dispatch_BuildRadixTree(n_threads, p.get());
+    cpu::dispatch_BuildRadixTree(n_threads, p.get(), 0);
   }
 }
 
@@ -102,7 +102,7 @@ BENCHMARK_DEFINE_F(CPU, BM_EdgeCount)(benchmark::State& state) {
   const auto n_threads = state.range(0);
 
   for (auto _ : state) {
-    cpu::dispatch_EdgeCount(n_threads, p.get());
+    cpu::dispatch_EdgeCount(n_threads, p.get(), 0);
   }
 }
 
@@ -114,7 +114,7 @@ BENCHMARK_DEFINE_F(CPU, BM_EdgeOffset)(benchmark::State& state) {
   const auto n_threads = state.range(0);
 
   for (auto _ : state) {
-    cpu::dispatch_EdgeOffset(n_threads, p.get());
+    cpu::dispatch_EdgeOffset(n_threads, p.get(), 0);
   }
 }
 
@@ -126,7 +126,7 @@ BENCHMARK_DEFINE_F(CPU, BM_Octree)(benchmark::State& state) {
   const auto n_threads = state.range(0);
 
   for (auto _ : state) {
-    cpu::dispatch_BuildOctree(n_threads, p.get());
+    cpu::dispatch_BuildOctree(n_threads, p.get(), 0);
   }
 }
 
@@ -181,33 +181,141 @@ void register_benchmarks() {
       ->Iterations(n_iterations);
 }
 
+void printCpuInfo() {
+  std::ifstream cpuInfo("/proc/cpuinfo");
+  if (!cpuInfo.is_open()) {
+    std::cerr << "Unable to open file" << std::endl;
+    return;
+  }
+
+  std::string content((std::istreambuf_iterator<char>(cpuInfo)),
+                      std::istreambuf_iterator<char>());
+  cpuInfo.close();
+
+  // New regex pattern to handle newlines correctly
+  std::regex pattern(R"(processor\s*:\s*(\d+)[\s\S]*?BogoMIPS\s*:\s*([\d\.]+))",
+                     std::regex::ECMAScript);
+  std::map<float, std::vector<int>> coreBogoMIPS;
+
+  auto begin = std::sregex_iterator(content.begin(), content.end(), pattern);
+  auto end = std::sregex_iterator();
+
+  for (auto i = begin; i != end; ++i) {
+    std::smatch match = *i;
+    int processorId = std::stoi(match[1].str());
+    float bogoMIPS = std::stof(match[2].str());
+    coreBogoMIPS[bogoMIPS].push_back(processorId);
+  }
+
+  // Print header
+  std::cout << "------------------------------------------" << std::endl;
+  std::cout << "| Core Type       | BogoMIPS | Cores      |" << std::endl;
+  std::cout << "------------------------------------------" << std::endl;
+
+  int typeCount = 0;
+  for (const auto& entry : coreBogoMIPS) {
+    std::cout << "| Core Type " << ++typeCount << "     | " << entry.first
+              << "    | ";
+    for (auto it = entry.second.begin(); it != entry.second.end(); ++it) {
+      if (it != entry.second.begin()) {
+        std::cout << ", ";
+      }
+      std::cout << *it;
+    }
+    std::cout << " |" << std::endl;
+    std::cout << "------------------------------------------" << std::endl;
+  }
+}
+
 int main(int argc, char** argv) {
-  CLI::App app{"CPU Benchmark"};
+  CLI::App app{"UCSC Redwood: CPU Tree Construction/Traversal Pipeline"};
   app.allow_extras();
 
-  // Determine the maximum number of threads supported by the hardware
-  max_threads = std::thread::hardware_concurrency();
-  std::vector<int> cores = {};
+  bool list_cores = false;
+  app.add_flag("-i,--info", list_cores, "Get the CPU information");
 
-  // Add option for thread pinning to specific cores
-  app.add_option(
-         "--cores", cores, "Set specific cores to run the benchmarks on")
-      ->expected(1, max_threads);
+  bool benchmark_mode = false;
+  app.add_flag("-b,--benchmark", benchmark_mode, "Run a pipeline benchmark");
+
+  std::vector<int> core_ids;
+  app.add_option("-c,--cores",
+                 core_ids,
+                 "Specific core IDs to run the benchmark on. ex: 0 1 2 3 4 5");
+
+  bool pipeline_mode = false;
+  app.add_flag(
+      "-p,--pipeline", pipeline_mode, "Run a single pipeline instance");
+
+  std::vector<std::string> core_groups_str;
+  app.add_option("-g,--groups",
+                 core_groups_str,
+                 "Thread pool core groups for pipeline stages (comma-separated "
+                 "core IDs) ex: 0,1,2 3,4,5");
 
   CLI11_PARSE(app, argc, argv);
 
-  // Adjust max_threads based on the number of specified cores
-  if (!cores.empty()) {
-    max_threads = cores.size();
+  // Determine the maximum number of threads supported by the hardware
+  max_threads = std::thread::hardware_concurrency();
+
+  if (list_cores) {
+    printCpuInfo();
+    return 0;
   }
 
-  cpu::start_thread_pool(max_threads, cores);
-  register_benchmarks();
+  if (pipeline_mode) {
+    if (core_groups_str.empty()) {
+    }
+    //  Parse the core groups
+    std::vector<std::vector<int>> core_groups;
+    for (const auto& group : core_groups_str) {
+      std::vector<int> core_group;
+      std::stringstream ss(group);
+      int core_id;
+      while (ss >> core_id) {
+        core_group.push_back(core_id);
+        if (ss.peek() == ',') {
+          ss.ignore();
+        }
+      }
+      core_groups.push_back(core_group);
+    }
+    // print core_groups
+    for (const auto& group : core_groups) {
+      std::cout << "Core group: ";
+      for (int id : group) {
+        std::cout << id << " ";
+      }
+      std::cout << std::endl;
+    }
+    // TODO: Validate the core groups
 
-  // Initialize Google Benchmark
-  benchmark::Initialize(&argc, argv);
+    // TODO: Run the pipeline
+  } else {
+    // Declare a 2D vector to store the core IDs
+    std::vector<std::vector<int>> core_ids_2d_vec;
+    // Adjust max_threads based on the number of specified cores
+    if (!core_ids.empty()) {
+      max_threads = core_ids.size();
+      // Print the benchmark information
+      std::cout << "Running benchmark on cores:";
+      for (int core_id : core_ids) {
+        std::cout << core_id << " ";
+      }
+      core_ids_2d_vec.push_back(core_ids);
+    } else {
+      // Print the benchmark information
+      std::cout << "Running benchmark on all cores";
+    }
+    std::cout << std::endl;
 
-  // Register and run benchmarks
-  benchmark::RunSpecifiedBenchmarks();
+    // Start the thread manager
+    cpu::start_thread_manager(core_ids_2d_vec);
+    // Register benchmarks
+    register_benchmarks();
+    // Initialize Google Benchmark
+    benchmark::Initialize(&argc, argv);
+    // Run benchmarks
+    benchmark::RunSpecifiedBenchmarks();
+  }
   return 0;
 }
