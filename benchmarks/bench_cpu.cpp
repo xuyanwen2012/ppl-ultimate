@@ -20,7 +20,7 @@ constexpr auto seed = 114514;
 unsigned max_threads;
 constexpr auto n_iterations = 50;
 
-void gen_data(const std::unique_ptr<pipe>& p) {
+void gen_data(const std::unique_ptr<struct pipe>& p) {
   std::mt19937 gen(seed);  // NOLINT(cert-msc51-cpp)
   std::uniform_real_distribution dis(min_coord, min_coord + range);
   std::generate_n(p->u_points, n, [&dis, &gen] {
@@ -30,7 +30,7 @@ void gen_data(const std::unique_ptr<pipe>& p) {
 
 class CPU : public benchmark::Fixture {
  public:
-  explicit CPU() : p(std::make_unique<pipe>(n, min_coord, range, seed)) {
+  explicit CPU() : p(std::make_unique<struct pipe>(n, min_coord, range, seed)) {
     gen_data(p);
 
     // basically pregenerate the data
@@ -43,7 +43,7 @@ class CPU : public benchmark::Fixture {
     cpu::dispatch_BuildOctree(max_threads, p.get(), 0);
   }
 
-  std::unique_ptr<pipe> p;
+  std::unique_ptr<struct pipe> p;
 };
 
 // --------------------------------------------------
