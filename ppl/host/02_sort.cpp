@@ -1,5 +1,6 @@
 #include "host/02_sort.hpp"
 
+#include <algorithm>
 #include <numeric>
 
 #include "block.hpp"

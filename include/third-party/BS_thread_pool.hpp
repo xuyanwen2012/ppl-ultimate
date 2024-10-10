@@ -204,7 +204,7 @@ class [[nodiscard]] multi_future : public std::vector<std::future<T>> {
   multi_future& operator=(const multi_future&) = delete;
 
   // The move constructor and move assignment operator are defaulted.
-  multi_future(multi_future &&) = default;
+  multi_future(multi_future&&) = default;
   multi_future& operator=(multi_future&&) = default;
 
   /**
@@ -372,7 +372,7 @@ class [[nodiscard]] thread_pool {
   // The copy and move constructors and assignment operators are deleted. The
   // thread pool uses a mutex, which cannot be copied or moved.
   thread_pool(const thread_pool&) = delete;
-  thread_pool(thread_pool &&) = delete;
+  thread_pool(thread_pool&&) = delete;
   thread_pool& operator=(const thread_pool&) = delete;
   thread_pool& operator=(thread_pool&&) = delete;
 
@@ -512,7 +512,7 @@ class [[nodiscard]] thread_pool {
    * `BS_THREAD_POOL_ENABLE_PRIORITY` is defined.
    */
   template <typename F>
-  void detach_task(F && task BS_THREAD_POOL_PRIORITY_INPUT) {
+  void detach_task(F&& task BS_THREAD_POOL_PRIORITY_INPUT) {
     {
       const std::scoped_lock tasks_lock(tasks_mutex);
       tasks.emplace(std::forward<F>(task) BS_THREAD_POOL_PRIORITY_OUTPUT);
@@ -735,8 +735,8 @@ class [[nodiscard]] thread_pool {
    * executing and/or obtain its returned value if it has one.
    */
   template <typename F, typename R = std::invoke_result_t<std::decay_t<F>>>
-  [[nodiscard]] std::future<R> submit_task(F &&
-                                           task BS_THREAD_POOL_PRIORITY_INPUT) {
+  [[nodiscard]] std::future<R> submit_task(
+      F&& task BS_THREAD_POOL_PRIORITY_INPUT) {
     const std::shared_ptr<std::promise<R>> task_promise =
         std::make_shared<std::promise<R>>();
     detach_task([task = std::forward<F>(task), task_promise] {
@@ -1026,7 +1026,7 @@ class [[nodiscard]] thread_pool {
    * same pool, which would result in a deadlock.
    */
   struct wait_deadlock : public std::runtime_error {
-    wait_deadlock() : std::runtime_error("BS::thread_pool::wait_deadlock"){};
+    wait_deadlock() : std::runtime_error("BS::thread_pool::wait_deadlock") {};
   };
 #endif
 
@@ -1254,7 +1254,7 @@ class [[nodiscard]] thread_pool {
      * @param task_ The task.
      * @param priority_ The desired priority.
      */
-    explicit pr_task(std::function<void()> && task_,
+    explicit pr_task(std::function<void()>&& task_,
                      const priority_t priority_ = 0)
         : task(std::move(task_)), priority(priority_) {}
 
@@ -1284,9 +1284,9 @@ class [[nodiscard]] thread_pool {
   };  // class pr_task
 #endif
 
-    // ============
-    // Private data
-    // ============
+  // ============
+  // Private data
+  // ============
 
 #ifdef BS_THREAD_POOL_ENABLE_PAUSE
   /**
