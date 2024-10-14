@@ -30,7 +30,7 @@ void sync_stream(const int stream_id) {
 
 void dispatch_ComputeMorton(const int grid_size,
                             const int stream_id,
-                            pipe* pipe) {
+                            struct pipe* pipe) {
   constexpr auto block_size = 768;
 
   k_ComputeMortonCode<<<grid_size, block_size, 0, streams[stream_id]>>>(
@@ -41,7 +41,9 @@ void dispatch_ComputeMorton(const int grid_size,
       pipe->range);
 }
 
-void dispatch_RadixSort(const int grid_size, const int stream_id, pipe* pipe) {
+void dispatch_RadixSort(const int grid_size,
+                        const int stream_id,
+                        struct pipe* pipe) {
   const auto n = pipe->n_input();
 
   static_assert(sizeof(morton_t) == sizeof(unsigned int));
@@ -101,7 +103,7 @@ void dispatch_RadixSort(const int grid_size, const int stream_id, pipe* pipe) {
 
 void dispatch_RemoveDuplicates_sync(const int grid_size,
                                     const int stream_id,
-                                    pipe* pipe) {
+                                    struct pipe* pipe) {
   constexpr auto unique_block_size = UniqueAgent::n_threads;  // 256
   constexpr auto prefix_block_size =
       PrefixSumAgent<unsigned int>::n_threads;  // 128
@@ -139,7 +141,7 @@ void dispatch_RemoveDuplicates_sync(const int grid_size,
 
 void dispatch_BuildRadixTree(const int grid_size,
                              const int stream_id,
-                             pipe* pipe) {
+                             struct pipe* pipe) {
   constexpr auto n_threads = 512;
   const auto& stream = streams[stream_id];
 
@@ -153,7 +155,9 @@ void dispatch_BuildRadixTree(const int grid_size,
       pipe->brt.u_parents);
 }
 
-void dispatch_EdgeCount(const int grid_size, const int stream_id, pipe* pipe) {
+void dispatch_EdgeCount(const int grid_size,
+                        const int stream_id,
+                        struct pipe* pipe) {
   constexpr auto block_size = 512;
   const auto& stream = streams[stream_id];
 
@@ -163,7 +167,9 @@ void dispatch_EdgeCount(const int grid_size, const int stream_id, pipe* pipe) {
                                                     pipe->n_brt_nodes());
 }
 
-void dispatch_EdgeOffset(const int grid_size, const int stream_id, pipe* pipe) {
+void dispatch_EdgeOffset(const int grid_size,
+                         const int stream_id,
+                         struct pipe* pipe) {
   constexpr auto n_threads = PrefixSumAgent<int>::n_threads;
   const auto& stream = streams[stream_id];
 
@@ -176,7 +182,7 @@ void dispatch_EdgeOffset(const int grid_size, const int stream_id, pipe* pipe) {
 
 void dispatch_BuildOctree(const int grid_size,
                           const int stream_id,
-                          pipe* pipe) {
+                          struct pipe* pipe) {
   constexpr auto block_size = 512;
   const auto& stream = streams[stream_id];
 
