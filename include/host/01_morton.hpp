@@ -1,5 +1,7 @@
 #pragma once
 
+#include <algorithm>
+
 #include "shared/morton_func.h"
 #include "third-party/BS_thread_pool.hpp"
 
