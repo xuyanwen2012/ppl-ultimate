@@ -12,5 +12,5 @@ end
 
 includes("ppl")
 --includes("tests")
---includes("demo")
-includes("benchmarks")
+includes("demo")
+-- includes("benchmarks")

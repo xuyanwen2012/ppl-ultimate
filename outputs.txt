@@ -1,0 +1,493 @@
+Running on device: 3A021JEHN02756
+./build/android/armeabi-v7a/release/mini-demo: 1 file pushed, 0 skipped. 333.8 MB/s (423240 bytes in 0.001s)
+
+CPU Information:
+processor	: 0
+model name	: ARMv8 Processor rev 0 (v8l)
+BogoMIPS	: 49.15
+Features	: half thumb fastmult vfp edsp neon vfpv3 tls vfpv4 idiva idivt lpae evtstrm aes pmull sha1 sha2 crc32
+CPU implementer	: 0x41
+CPU architecture: 8
+CPU variant	: 0x2
+CPU part	: 0xd05
+CPU revision	: 0
+
+processor	: 1
+model name	: ARMv8 Processor rev 0 (v8l)
+BogoMIPS	: 49.15
+Features	: half thumb fastmult vfp edsp neon vfpv3 tls vfpv4 idiva idivt lpae evtstrm aes pmull sha1 sha2 crc32
+CPU implementer	: 0x41
+CPU architecture: 8
+CPU variant	: 0x2
+CPU part	: 0xd05
+CPU revision	: 0
+
+processor	: 2
+model name	: ARMv8 Processor rev 0 (v8l)
+BogoMIPS	: 49.15
+Features	: half thumb fastmult vfp edsp neon vfpv3 tls vfpv4 idiva idivt lpae evtstrm aes pmull sha1 sha2 crc32
+CPU implementer	: 0x41
+CPU architecture: 8
+CPU variant	: 0x2
+CPU part	: 0xd05
+CPU revision	: 0
+
+processor	: 3
+model name	: ARMv8 Processor rev 0 (v8l)
+BogoMIPS	: 49.15
+Features	: half thumb fastmult vfp edsp neon vfpv3 tls vfpv4 idiva idivt lpae evtstrm aes pmull sha1 sha2 crc32
+CPU implementer	: 0x41
+CPU architecture: 8
+CPU variant	: 0x2
+CPU part	: 0xd05
+CPU revision	: 0
+
+processor	: 4
+model name	: ARMv8 Processor rev 1 (v8l)
+BogoMIPS	: 49.15
+Features	: half thumb fastmult vfp edsp neon vfpv3 tls vfpv4 idiva idivt lpae evtstrm aes pmull sha1 sha2 crc32
+CPU implementer	: 0x41
+CPU architecture: 8
+CPU variant	: 0x1
+CPU part	: 0xd41
+CPU revision	: 1
+
+processor	: 5
+model name	: ARMv8 Processor rev 1 (v8l)
+BogoMIPS	: 49.15
+Features	: half thumb fastmult vfp edsp neon vfpv3 tls vfpv4 idiva idivt lpae evtstrm aes pmull sha1 sha2 crc32
+CPU implementer	: 0x41
+CPU architecture: 8
+CPU variant	: 0x1
+CPU part	: 0xd41
+CPU revision	: 1
+
+processor	: 6
+model name	: ARMv8 Processor rev 0 (v8l)
+BogoMIPS	: 49.15
+Features	: half thumb fastmult vfp edsp neon vfpv3 tls vfpv4 idiva idivt lpae evtstrm aes pmull sha1 sha2 crc32
+CPU implementer	: 0x41
+CPU architecture: 8
+CPU variant	: 0x1
+CPU part	: 0xd44
+CPU revision	: 0
+
+processor	: 7
+model name	: ARMv8 Processor rev 0 (v8l)
+BogoMIPS	: 49.15
+Features	: half thumb fastmult vfp edsp neon vfpv3 tls vfpv4 idiva idivt lpae evtstrm aes pmull sha1 sha2 crc32
+CPU implementer	: 0x41
+CPU architecture: 8
+CPU variant	: 0x1
+CPU part	: 0xd44
+CPU revision	: 0
+
+Core ID   Float Time (ms)     Matrix Time (ms)    Graph Time (ms)     
+----------------------------------------------------------------------
+0         30.8128             118.159             107.685             
+1         30.5538             116.193             103.992             
+2         32.3431             115.224             108.961             
+3         30.5548             117.212             105.786             
+4         7.16862             11.9875             37.1959             
+5         6.95133             11.9455             37.08               
+6         6.97021             18.4946             36.4351             
+7         6.45801             19.0022             37.6956             
+Finished running on device: 3A021JEHN02756
+------------------------------------
+Running on device: 9b034f1b
+./build/android/armeabi-v7a/release/mini-demo: 1 file pushed, 0 skipped. 336.1 MB/s (423240 bytes in 0.001s)
+
+CPU Information:
+processor	: 0
+model name	: ARMv8 Processor rev 1 (v8l)
+BogoMIPS	: 38.40
+Features	: half thumb fastmult vfp edsp neon vfpv3 tls vfpv4 idiva idivt lpae evtstrm aes pmull sha1 sha2 crc32
+CPU implementer	: 0x41
+CPU architecture: 8
+CPU variant	: 0x1
+CPU part	: 0xd46
+CPU revision	: 1
+
+processor	: 1
+model name	: ARMv8 Processor rev 1 (v8l)
+BogoMIPS	: 38.40
+Features	: half thumb fastmult vfp edsp neon vfpv3 tls vfpv4 idiva idivt lpae evtstrm aes pmull sha1 sha2 crc32
+CPU implementer	: 0x41
+CPU architecture: 8
+CPU variant	: 0x1
+CPU part	: 0xd46
+CPU revision	: 1
+
+processor	: 2
+model name	: ARMv8 Processor rev 1 (v8l)
+BogoMIPS	: 38.40
+Features	: half thumb fastmult vfp edsp neon vfpv3 tls vfpv4 idiva idivt lpae evtstrm aes pmull sha1 sha2 crc32
+CPU implementer	: 0x41
+CPU architecture: 8
+CPU variant	: 0x1
+CPU part	: 0xd46
+CPU revision	: 1
+
+processor	: 3
+model name	: ARMv8 Processor rev 0 (v8l)
+BogoMIPS	: 38.40
+Features	: half thumb fastmult vfp edsp neon vfpv3 tls vfpv4 idiva idivt lpae evtstrm aes pmull sha1 sha2 crc32
+CPU implementer	: 0x41
+CPU architecture: 8
+CPU variant	: 0x1
+CPU part	: 0xd4d
+CPU revision	: 0
+
+processor	: 4
+model name	: ARMv8 Processor rev 0 (v8l)
+BogoMIPS	: 38.40
+Features	: half thumb fastmult vfp edsp neon vfpv3 tls vfpv4 idiva idivt lpae evtstrm aes pmull sha1 sha2 crc32
+CPU implementer	: 0x41
+CPU architecture: 8
+CPU variant	: 0x1
+CPU part	: 0xd4d
+CPU revision	: 0
+
+processor	: 5
+model name	: ARMv8 Processor rev 0 (v8l)
+BogoMIPS	: 38.40
+Features	: half thumb fastmult vfp edsp neon vfpv3 tls vfpv4 idiva idivt lpae evtstrm aes pmull sha1 sha2 crc32
+CPU implementer	: 0x41
+CPU architecture: 8
+CPU variant	: 0x2
+CPU part	: 0xd47
+CPU revision	: 0
+
+processor	: 6
+model name	: ARMv8 Processor rev 0 (v8l)
+BogoMIPS	: 38.40
+Features	: half thumb fastmult vfp edsp neon vfpv3 tls vfpv4 idiva idivt lpae evtstrm aes pmull sha1 sha2 crc32
+CPU implementer	: 0x41
+CPU architecture: 8
+CPU variant	: 0x2
+CPU part	: 0xd47
+CPU revision	: 0
+
+processor	: 7
+model name	: ARMv8 Processor rev 0 (v8l)
+BogoMIPS	: 38.40
+Features	: half thumb fastmult vfp edsp neon vfpv3 tls vfpv4 idiva idivt lpae evtstrm aes pmull sha1 sha2 crc32
+CPU implementer	: 0x41
+CPU architecture: 8
+CPU variant	: 0x1
+CPU part	: 0xd4e
+CPU revision	: 0
+
+Core ID   Float Time (ms)     Matrix Time (ms)    Graph Time (ms)     
+----------------------------------------------------------------------
+0         56.7477             134.681             79.7574             
+1         28.3203             99.9204             76.2206             
+2         28.7258             103.378             71.357              
+3         11.3376             49.6889             49.2278             
+4         9.11068             58.0207             39.0156             
+5         9.24109             17.6354             65.9387             
+6         9.03401             50.3649             61.6418             
+7         41.3928             87.485              32.6577             
+Finished running on device: 9b034f1b
+------------------------------------
+Running on device: RFCT80DAADN
+./build/android/armeabi-v7a/release/mini-demo: 1 file pushed, 0 skipped. 324.6 MB/s (423240 bytes in 0.001s)
+
+CPU Information:
+processor	: 0
+model name	: ARMv8 Processor rev 2 (v8l)
+BogoMIPS	: 51.20
+Features	: half thumb fastmult vfp edsp neon vfpv3 tls vfpv4 idiva idivt lpae evtstrm aes pmull sha1 sha2 crc32
+CPU implementer	: 0x41
+CPU architecture: 8
+CPU variant	: 0x0
+CPU part	: 0xd46
+CPU revision	: 2
+
+processor	: 1
+model name	: ARMv8 Processor rev 2 (v8l)
+BogoMIPS	: 51.20
+Features	: half thumb fastmult vfp edsp neon vfpv3 tls vfpv4 idiva idivt lpae evtstrm aes pmull sha1 sha2 crc32
+CPU implementer	: 0x41
+CPU architecture: 8
+CPU variant	: 0x0
+CPU part	: 0xd46
+CPU revision	: 2
+
+processor	: 2
+model name	: ARMv8 Processor rev 2 (v8l)
+BogoMIPS	: 51.20
+Features	: half thumb fastmult vfp edsp neon vfpv3 tls vfpv4 idiva idivt lpae evtstrm aes pmull sha1 sha2 crc32
+CPU implementer	: 0x41
+CPU architecture: 8
+CPU variant	: 0x0
+CPU part	: 0xd46
+CPU revision	: 2
+
+processor	: 3
+model name	: ARMv8 Processor rev 2 (v8l)
+BogoMIPS	: 51.20
+Features	: half thumb fastmult vfp edsp neon vfpv3 tls vfpv4 idiva idivt lpae evtstrm aes pmull sha1 sha2 crc32
+CPU implementer	: 0x41
+CPU architecture: 8
+CPU variant	: 0x0
+CPU part	: 0xd46
+CPU revision	: 2
+
+processor	: 4
+model name	: ARMv8 Processor rev 0 (v8l)
+BogoMIPS	: 51.20
+Features	: half thumb fastmult vfp edsp neon vfpv3 tls vfpv4 idiva idivt lpae evtstrm aes pmull sha1 sha2 crc32
+CPU implementer	: 0x41
+CPU architecture: 8
+CPU variant	: 0x2
+CPU part	: 0xd47
+CPU revision	: 0
+
+processor	: 5
+model name	: ARMv8 Processor rev 0 (v8l)
+BogoMIPS	: 51.20
+Features	: half thumb fastmult vfp edsp neon vfpv3 tls vfpv4 idiva idivt lpae evtstrm aes pmull sha1 sha2 crc32
+CPU implementer	: 0x41
+CPU architecture: 8
+CPU variant	: 0x2
+CPU part	: 0xd47
+CPU revision	: 0
+
+processor	: 6
+model name	: ARMv8 Processor rev 0 (v8l)
+BogoMIPS	: 51.20
+Features	: half thumb fastmult vfp edsp neon vfpv3 tls vfpv4 idiva idivt lpae evtstrm aes pmull sha1 sha2 crc32
+CPU implementer	: 0x41
+CPU architecture: 8
+CPU variant	: 0x2
+CPU part	: 0xd47
+CPU revision	: 0
+
+processor	: 7
+model name	: ARMv8 Processor rev 0 (v8l)
+BogoMIPS	: 51.20
+Features	: half thumb fastmult vfp edsp neon vfpv3 tls vfpv4 idiva idivt lpae evtstrm aes pmull sha1 sha2 crc32
+CPU implementer	: 0x41
+CPU architecture: 8
+CPU variant	: 0x2
+CPU part	: 0xd48
+CPU revision	: 0
+
+Core ID   Float Time (ms)     Matrix Time (ms)    Graph Time (ms)     
+----------------------------------------------------------------------
+0         21.3821             48.7333             332.745             
+1         26.3227             46.1085             294.921             
+2         17.3889             32.7569             303.241             
+3         30.3186             48.7294             347.913             
+4         18.3638             32.527              285.997             
+5         25.3853             48.2937             328.334             
+6         25.379              48.6268             326.017             
+7         25.4545             48.6044             353.033             
+Finished running on device: RFCT80DAADN
+------------------------------------
+Running on device: ZY22FLDDK7
+./build/android/armeabi-v7a/release/mini-demo: 1 file pushed, 0 skipped. 330.1 MB/s (423240 bytes in 0.001s)
+
+CPU Information:
+processor	: 0
+Processor	: ARMv7 Processor rev 4 (v7l)
+model name	: ARMv7 Processor rev 4 (v7l)
+BogoMIPS	: 19.40
+Features	: half thumb fastmult vfp edsp neon vfpv3 tls vfpv4 idiva idivt vfpd32 lpae evtstrm aes pmull sha1 sha2 crc32 
+CPU implementer	: 0x41
+CPU architecture: 7
+CPU variant	: 0x0
+CPU part	: 0xd03
+CPU revision	: 4
+
+processor	: 1
+Processor	: ARMv7 Processor rev 4 (v7l)
+model name	: ARMv7 Processor rev 4 (v7l)
+BogoMIPS	: 19.40
+Features	: half thumb fastmult vfp edsp neon vfpv3 tls vfpv4 idiva idivt vfpd32 lpae evtstrm aes pmull sha1 sha2 crc32 
+CPU implementer	: 0x41
+CPU architecture: 7
+CPU variant	: 0x0
+CPU part	: 0xd03
+CPU revision	: 4
+
+processor	: 2
+Processor	: ARMv7 Processor rev 4 (v7l)
+model name	: ARMv7 Processor rev 4 (v7l)
+BogoMIPS	: 19.40
+Features	: half thumb fastmult vfp edsp neon vfpv3 tls vfpv4 idiva idivt vfpd32 lpae evtstrm aes pmull sha1 sha2 crc32 
+CPU implementer	: 0x41
+CPU architecture: 7
+CPU variant	: 0x0
+CPU part	: 0xd03
+CPU revision	: 4
+
+processor	: 3
+Processor	: ARMv7 Processor rev 4 (v7l)
+model name	: ARMv7 Processor rev 4 (v7l)
+BogoMIPS	: 19.40
+Features	: half thumb fastmult vfp edsp neon vfpv3 tls vfpv4 idiva idivt vfpd32 lpae evtstrm aes pmull sha1 sha2 crc32 
+CPU implementer	: 0x41
+CPU architecture: 7
+CPU variant	: 0x0
+CPU part	: 0xd03
+CPU revision	: 4
+
+processor	: 4
+Processor	: ARMv7 Processor rev 4 (v7l)
+model name	: ARMv7 Processor rev 4 (v7l)
+BogoMIPS	: 14.48
+Features	: half thumb fastmult vfp edsp neon vfpv3 tls vfpv4 idiva idivt vfpd32 lpae evtstrm aes pmull sha1 sha2 crc32 
+CPU implementer	: 0x41
+CPU architecture: 7
+CPU variant	: 0x0
+CPU part	: 0xd03
+CPU revision	: 4
+
+processor	: 5
+Processor	: ARMv7 Processor rev 4 (v7l)
+model name	: ARMv7 Processor rev 4 (v7l)
+BogoMIPS	: 14.48
+Features	: half thumb fastmult vfp edsp neon vfpv3 tls vfpv4 idiva idivt vfpd32 lpae evtstrm aes pmull sha1 sha2 crc32 
+CPU implementer	: 0x41
+CPU architecture: 7
+CPU variant	: 0x0
+CPU part	: 0xd03
+CPU revision	: 4
+
+processor	: 6
+Processor	: ARMv7 Processor rev 4 (v7l)
+model name	: ARMv7 Processor rev 4 (v7l)
+BogoMIPS	: 14.48
+Features	: half thumb fastmult vfp edsp neon vfpv3 tls vfpv4 idiva idivt vfpd32 lpae evtstrm aes pmull sha1 sha2 crc32 
+CPU implementer	: 0x41
+CPU architecture: 7
+CPU variant	: 0x0
+CPU part	: 0xd03
+CPU revision	: 4
+
+processor	: 7
+Processor	: ARMv7 Processor rev 4 (v7l)
+model name	: ARMv7 Processor rev 4 (v7l)
+BogoMIPS	: 14.48
+Features	: half thumb fastmult vfp edsp neon vfpv3 tls vfpv4 idiva idivt vfpd32 lpae evtstrm aes pmull sha1 sha2 crc32 
+CPU implementer	: 0x41
+CPU architecture: 7
+CPU variant	: 0x0
+CPU part	: 0xd03
+CPU revision	: 4
+
+Hardware	: MT6762G
+Revision	: 0000
+Serial		: 0000000000000000
+Core ID   Float Time (ms)     Matrix Time (ms)    Graph Time (ms)     
+----------------------------------------------------------------------
+0         35.9385             313.362             311.518             
+1         36.0893             315.216             303.489             
+2         35.713              316.143             303.834             
+3         35.5397             314.346             306.246             
+4         43.4213             366.246             229.819             
+5         43.1234             363.775             231.724             
+6         43.3252             371.398             232.57              
+7         42.0465             367.855             235.187             
+Finished running on device: ZY22FLDDK7
+------------------------------------
+Running on device: ce0717178d7758b00b7e
+./build/android/armeabi-v7a/release/mini-demo: 1 file pushed, 0 skipped. 2564.5 MB/s (423240 bytes in 0.000s)
+
+CPU Information:
+Processor	: AArch64 Processor rev 4 (aarch64)
+processor	: 0
+model name	: ARMv8 Processor rev 4 (v8l)
+BogoMIPS	: 38.40
+Features	: half thumb fastmult vfp edsp neon vfpv3 tls vfpv4 idiva idivt lpae evtstrm aes pmull sha1 sha2 crc32
+CPU implementer	: 0x51
+CPU architecture: 8
+CPU variant	: 0xa
+CPU part	: 0x801
+CPU revision	: 4
+
+processor	: 1
+model name	: ARMv8 Processor rev 4 (v8l)
+BogoMIPS	: 38.40
+Features	: half thumb fastmult vfp edsp neon vfpv3 tls vfpv4 idiva idivt lpae evtstrm aes pmull sha1 sha2 crc32
+CPU implementer	: 0x51
+CPU architecture: 8
+CPU variant	: 0xa
+CPU part	: 0x801
+CPU revision	: 4
+
+processor	: 2
+model name	: ARMv8 Processor rev 4 (v8l)
+BogoMIPS	: 38.40
+Features	: half thumb fastmult vfp edsp neon vfpv3 tls vfpv4 idiva idivt lpae evtstrm aes pmull sha1 sha2 crc32
+CPU implementer	: 0x51
+CPU architecture: 8
+CPU variant	: 0xa
+CPU part	: 0x801
+CPU revision	: 4
+
+processor	: 3
+model name	: ARMv8 Processor rev 4 (v8l)
+BogoMIPS	: 38.40
+Features	: half thumb fastmult vfp edsp neon vfpv3 tls vfpv4 idiva idivt lpae evtstrm aes pmull sha1 sha2 crc32
+CPU implementer	: 0x51
+CPU architecture: 8
+CPU variant	: 0xa
+CPU part	: 0x801
+CPU revision	: 4
+
+processor	: 4
+model name	: ARMv8 Processor rev 1 (v8l)
+BogoMIPS	: 38.40
+Features	: half thumb fastmult vfp edsp neon vfpv3 tls vfpv4 idiva idivt lpae evtstrm aes pmull sha1 sha2 crc32
+CPU implementer	: 0x51
+CPU architecture: 8
+CPU variant	: 0xa
+CPU part	: 0x800
+CPU revision	: 1
+
+processor	: 5
+model name	: ARMv8 Processor rev 1 (v8l)
+BogoMIPS	: 38.40
+Features	: half thumb fastmult vfp edsp neon vfpv3 tls vfpv4 idiva idivt lpae evtstrm aes pmull sha1 sha2 crc32
+CPU implementer	: 0x51
+CPU architecture: 8
+CPU variant	: 0xa
+CPU part	: 0x800
+CPU revision	: 1
+
+processor	: 6
+model name	: ARMv8 Processor rev 1 (v8l)
+BogoMIPS	: 38.40
+Features	: half thumb fastmult vfp edsp neon vfpv3 tls vfpv4 idiva idivt lpae evtstrm aes pmull sha1 sha2 crc32
+CPU implementer	: 0x51
+CPU architecture: 8
+CPU variant	: 0xa
+CPU part	: 0x800
+CPU revision	: 1
+
+processor	: 7
+model name	: ARMv8 Processor rev 1 (v8l)
+BogoMIPS	: 38.40
+Features	: half thumb fastmult vfp edsp neon vfpv3 tls vfpv4 idiva idivt lpae evtstrm aes pmull sha1 sha2 crc32
+CPU implementer	: 0x51
+CPU architecture: 8
+CPU variant	: 0xa
+CPU part	: 0x800
+CPU revision	: 1
+
+Hardware	: Qualcomm Technologies, Inc MSM8998
+Core ID   Float Time (ms)     Matrix Time (ms)    Graph Time (ms)     
+----------------------------------------------------------------------
+0         42.5444             244.675             114.468             
+1         61.764              221.792             99.4592             
+2         68.0447             217.211             98.0805             
+3         42.3319             228.568             104.09              
+4         56.534              26.1554             50.9497             
+5         25.6667             24.6308             43.7139             
+6         47.8138             62.3285             41.0002             
+7         16.7535             24.0356             49.3466             
+Finished running on device: ce0717178d7758b00b7e
+------------------------------------
